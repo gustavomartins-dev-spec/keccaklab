@@ -36,32 +36,18 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
       <div className="page-heading">
         <div>
           <span className="section-kicker">
-            <span /> APRENDA EXPLORANDO
+            <span /> VISUALIZAÇÃO DE ESTADO
           </span>
           <h1>
-            Por dentro do <em>Keccak.</em>
+            Visualizar <em>Keccak</em>
           </h1>
           <p className="heading-description">
-            Uma mensagem. Cinco transformações. Inúmeras descobertas.
-            <br className="desktop-break" /> Explore uma rodada do algoritmo por trás do SHA-3,
-            passo a passo.
+            Estados intermediários das etapas θ, ρ, π, χ e ι em uma matriz de 200 bits.
           </p>
-        </div>
-        <div className="lesson-badge">
-          <span className="lesson-badge-icon">
-            <Icon name="grid" size={25} />
-          </span>
-          <div>
-            <strong>Visualize cada bit.</strong>
-            <span>Entenda cada transformação.</span>
-          </div>
         </div>
       </div>
       <div className="section-heading">
-        <h2>Sua jornada pela rodada</h2>
-        <span>
-          Clique em uma etapa para explorar <Icon name="arrow-right" size={14} />
-        </span>
+        <h2>Etapas da rodada</h2>
       </div>
       <StepNavigator step={step} onSelectStep={selectStep} />
       <div className="keccak-layout">
@@ -87,16 +73,16 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
           <Icon name="book" size={21} />
         </span>
         <div>
-          <strong>Pequeno no tamanho. Grande na ideia.</strong>
+          <strong>Representação do estado</strong>
           <p>
-            Usamos uma versão didática de 200 bits para tornar cada movimento visível. Uma rodada
-            percorre θ → ρ → π → χ → ι.
+            A simulação utiliza uma matriz de 5 × 5 lanes de 8 bits. As etapas são aplicadas na
+            ordem θ → ρ → π → χ → ι.
           </p>
         </div>
-        <span className="footnote-tag">Feito para aprender</span>
+        <span className="footnote-tag">25 lanes × 8 bits</span>
       </div>
       <footer className="page-footer">
-        <span>KECCAK LAB</span>Explore com curiosidade. Aprenda na prática.
+        <span>KECCAK LAB</span>Visualização de estados e detecção de ciclos.
       </footer>
       {showDetails && (
         <TransformationModal detail={detail} step={step} matrix={matrix} onClose={closeDetails} />

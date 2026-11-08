@@ -2,7 +2,6 @@ import CollisionChart from '../components/collisions/CollisionChart';
 import CollisionSummary from '../components/collisions/CollisionSummary';
 import ComparisonSection from '../components/collisions/ComparisonSection';
 import ExperimentControls from '../components/collisions/ExperimentControls';
-import RunHistory from '../components/collisions/RunHistory';
 import type { CollisionExperimentController } from '../hooks/useCollisionExperiment';
 
 interface CollisionPageProps {
@@ -10,7 +9,7 @@ interface CollisionPageProps {
 }
 
 export default function CollisionPage({ experiment }: CollisionPageProps) {
-  const { bits, setBits, result, resultBits, runs, isSaving, comparison, execute, compare } =
+  const { bits, setBits, result, resultBits, isSaving, comparison, execute, compare } =
     experiment;
 
   return (
@@ -18,15 +17,11 @@ export default function CollisionPage({ experiment }: CollisionPageProps) {
       <div className="page-heading">
         <div>
           <span className="section-kicker">
-            <span /> DESCUBRA EXPERIMENTANDO
+            <span /> DETECÇÃO DE CICLOS
           </span>
-          <h1>
-            Encontre o <em>ponto de retorno.</em>
-          </h1>
+          <h1>Busca de colisões</h1>
           <p className="heading-description">
-            Caminhos diferentes. Um mesmo destino.
-            <br className="desktop-break" /> Explore ciclos e colisões com uma simulação de
-            Pollard's Rho.
+            Detecção de valores repetidos em uma sequência de hashes com saída de 4, 6 ou 8 bits.
           </p>
         </div>
       </div>
@@ -36,7 +31,6 @@ export default function CollisionPage({ experiment }: CollisionPageProps) {
         <CollisionSummary result={result} bits={resultBits} />
       </div>
       <ComparisonSection comparison={comparison} onCompare={compare} />
-      <RunHistory runs={runs} />
     </section>
   );
 }

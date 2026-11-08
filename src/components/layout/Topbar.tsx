@@ -17,14 +17,6 @@ export default function Topbar({ activePage }: TopbarProps) {
         <Icon name="chevron" size={13} />
         <strong>{title}</strong>
       </div>
-      <div className="topbar-meta">
-        <span className="algorithm-badge">
-          <span className="pulse-dot" /> Keccak-200
-        </span>
-        <span className="theme-label">
-          <Icon name="sun" size={17} /> Tema claro
-        </span>
-      </div>
     </header>
   );
 }

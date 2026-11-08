@@ -15,13 +15,13 @@ export default function CollisionChart({ result, bits }: CollisionChartProps) {
       <div className="panel-header">
         <div>
           <span className="panel-label">TRAJETÓRIA DO ESTADO</span>
-          <h3>O ciclo se fecha em {result.cycleLength} passos</h3>
+          <h3>Comprimento do ciclo: {result.cycleLength} iterações</h3>
         </div>
         <span className="round-tag">saída {bits} bits</span>
       </div>
       <div className="cycle-chart">
         <div className="chart-axis">
-          <span>valor hash</span>
+          <span>valor do hash</span>
           <span>iterações →</span>
         </div>
         <svg viewBox="0 0 800 300" role="img" aria-label="Gráfico da trajetória até a colisão">

@@ -35,7 +35,7 @@ describe('fluxos do laboratório', () => {
     const matrix = screen.getByLabelText('Estado interno em matriz 5 por 5');
     const initialState = matrix.textContent;
 
-    expect(screen.getByRole('heading', { name: 'Por dentro do Keccak.' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Visualizar Keccak' })).toBeInTheDocument();
     expect(matrix.children).toHaveLength(25);
     expect(screen.getByRole('button', { name: 'Etapa anterior' })).toBeDisabled();
 
@@ -60,7 +60,7 @@ describe('fluxos do laboratório', () => {
     await user.click(within(steps).getByRole('button', { name: /Theta/ }));
     await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
     expect(
-      screen.getByRole('heading', { name: 'Encontre o ponto de retorno.' }),
+      screen.getByRole('heading', { name: 'Busca de colisões' }),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Visualizador Keccak' }));
@@ -91,7 +91,7 @@ describe('fluxos do laboratório', () => {
   it('abre os detalhes da transformação e restaura o foco ao fechar', async () => {
     const user = renderApp();
     await user.click(screen.getByRole('button', { name: 'Próxima etapa' }));
-    const trigger = screen.getByRole('button', { name: 'Explorar esta transformação' });
+    const trigger = screen.getByRole('button', { name: 'Detalhes da transformação' });
     await user.click(trigger);
 
     const dialog = screen.getByRole('dialog', { name: 'Difusão por paridade de colunas' });
@@ -130,7 +130,7 @@ describe('fluxos do laboratório', () => {
     expect(screen.getByRole('button', { name: 'Pausar reprodução' })).toBeInTheDocument();
   });
 
-  it('executa a configuração escolhida, bloqueia novas buscas durante a gravação e mostra o histórico', async () => {
+  it('executa e salva a configuração escolhida, bloqueia novas buscas durante a gravação e preserva o resultado ao navegar', async () => {
     const pending = createDeferred<RunRecord | null>();
     vi.mocked(saveExperimentRun).mockReturnValueOnce(pending.promise);
     const user = renderApp();
@@ -143,17 +143,16 @@ describe('fluxos do laboratório', () => {
 
     expect(screen.getByText('saída 8 bits')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Salvando…' })).toBeDisabled();
+    expect(saveExperimentRun).toHaveBeenCalledExactlyOnceWith(8, expect.any(Object));
     await act(async () => {
       pending.resolve(createRun({ bits: 8 }));
     });
 
     expect(screen.getByRole('button', { name: 'Executar busca' })).toBeEnabled();
-    expect(screen.getByText('2 passos')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Visualizador Keccak' }));
     await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
     expect(screen.getByText('saída 8 bits')).toBeInTheDocument();
-    expect(screen.getByText('2 passos')).toBeInTheDocument();
   });
 
   it('compara as três saídas e conserva a comparação ao trocar de tela', async () => {

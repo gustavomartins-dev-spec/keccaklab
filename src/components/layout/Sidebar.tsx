@@ -24,10 +24,10 @@ export default function Sidebar({ activePage, step, onNavigate, onSelectStep }: 
             keccak<span>lab</span>
             <i />
           </strong>
-          <small>Criptografia na prática</small>
+          <small>Keccak e colisões</small>
         </div>
       </div>
-      <div className="sidebar-section-label">SEU LABORATÓRIO</div>
+      <div className="sidebar-section-label">MÓDULOS</div>
       <nav className="main-nav" aria-label="Navegação principal">
         {NAVIGATION_ITEMS.map((item) => (
           <button
@@ -43,10 +43,10 @@ export default function Sidebar({ activePage, step, onNavigate, onSelectStep }: 
         ))}
       </nav>
       <div className="sidebar-journey">
-        <div className="sidebar-section-label">PASSO A PASSO</div>
+        <div className="sidebar-section-label">ETAPAS DA RODADA</div>
         <div className="journey-heading">
           <Icon name="book" size={17} />
-          <span>Uma rodada de Keccak</span>
+          <span>Rodada Keccak</span>
         </div>
         <div
           className="journey-progress"
@@ -82,14 +82,6 @@ export default function Sidebar({ activePage, step, onNavigate, onSelectStep }: 
         </div>
       </div>
       <div className="sidebar-bottom">
-        <div className="sidebar-tip">
-          <span className="tip-icon">
-            <Icon name="sparkles" size={21} />
-          </span>
-          <strong>Aprenda experimentando.</strong>
-          <p>Grandes ideias ficam mais simples quando você pode vê-las acontecer.</p>
-          <span className="tip-tag">Um bit de cada vez.</span>
-        </div>
         <div className="sidebar-footer">
           <span className="pulse-dot" /> Laboratório interativo <span>v1.0</span>
         </div>

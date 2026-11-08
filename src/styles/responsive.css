@@ -10,7 +10,6 @@
   .nav-item { font-size: 11px; gap: 9px; padding-left: 10px; padding-right: 10px; }
   .page { padding-left: 28px; padding-right: 28px; }
   .topbar { padding-left: 28px; padding-right: 28px; }
-  .lesson-badge { display: none; }
   .keccak-layout { grid-template-columns: minmax(0, 1.2fr) minmax(270px, 1fr); gap: 16px; }
   .state-panel { padding: 20px 18px 0; }
   .explain-panel { padding: 20px; }
@@ -20,8 +19,6 @@
   .rho-layout { grid-template-columns: minmax(0, 1fr) 180px; gap: 16px; }
   .rho-visual { padding: 20px; }
   .footnote-tag { display: none; }
-  .history-strip { display: block; }
-  .history-list { margin-top: 16px; }
 }
 @media (max-width: 990px) {
   .sidebar { width: 210px; flex-basis: 210px; padding-left: 12px; padding-right: 12px; }
@@ -34,9 +31,7 @@
   .state-cell strong { font-size: 21px; }
   .explain-panel { gap: 20px; }
   .transform-symbol { margin-top: 18px; }
-  .topbar-meta .theme-label { display: none; }
   .step-button small { display: none; }
-  .section-heading > span { font-size: 8px; }
   .rho-layout { grid-template-columns: 1fr; }
   .rho-info { grid-template-columns: repeat(3, 1fr); }
   .method-note { grid-column: 1 / -1; }
@@ -60,7 +55,6 @@
   .topbar { height: 49px; padding: 0 21px; background: transparent; }
   .breadcrumb { font-size: 9px; gap: 8px; }
   .breadcrumb > svg:first-child { display: none; }
-  .algorithm-badge { font-size: 8px; padding: 5px 7px; gap: 5px; }
   .page { padding: 28px 20px 22px; }
   .page-heading { margin-bottom: 29px; }
   .section-kicker { font-size: 8px; letter-spacing: 1.2px; }
@@ -68,7 +62,6 @@
   .heading-description { font-size: 11px; line-height: 1.9; }
   .desktop-break { display: none; }
   .section-heading h2 { font-size: 12px; }
-  .section-heading > span { display: none; }
   .stepper { padding: 8px 5px; gap: 0; border-radius: 12px; margin-bottom: 18px; }
   .step-button { padding: 9px 2px; }
   .step-node { width: 31px; height: 32px; font-size: 21px; border-radius: 10px; margin-bottom: 8px; }
@@ -113,7 +106,7 @@
   .metric-card strong { font-size: 23px; }
   .metric-card small { font-size: 8px; }
   .method-note { padding: 12px 4px 4px; }
-  .comparison-section, .history-strip { padding: 20px; }
+  .comparison-section { padding: 20px; }
   .comparison-header h3 { font-size: 16px; line-height: 1.5; }
   .comparison-header .run-button { width: 100%; }
   .comparison-empty { padding: 13px; font-size: 10px; }

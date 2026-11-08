@@ -12,8 +12,8 @@ export default function ComparisonSection({ comparison, onCompare }: ComparisonS
     <div className="comparison-section">
       <div className="comparison-header">
         <div>
-          <span className="section-kicker">VÁ UM POUCO ALÉM</span>
-          <h3>Tamanho da saída × esforço de colisão</h3>
+          <span className="section-kicker">COMPARAÇÃO DE SAÍDAS</span>
+          <h3>Iterações por tamanho de saída</h3>
         </div>
         <button className="primary-button run-button" onClick={onCompare}>
           Comparar tamanhos <Icon name="arrow-right" size={16} />
@@ -21,8 +21,8 @@ export default function ComparisonSection({ comparison, onCompare }: ComparisonS
       </div>
       {comparison.length === 0 ? (
         <p className="comparison-empty">
-          Execute a comparação para ver o resultado de 4, 6 e 8 bits lado a lado, com a mesma
-          implementação do Keccak-200.
+          A comparação executa a busca com saídas de 4, 6 e 8 bits usando a mesma função de hash
+          e o mesmo estado inicial.
         </p>
       ) : (
         <>
@@ -34,17 +34,16 @@ export default function ComparisonSection({ comparison, onCompare }: ComparisonS
                 <span className="cmp-iter">
                   <strong>{entry.iterations}</strong> iterações
                 </span>
-                <span className="cmp-expected">esperado ≈ {entry.expected.toFixed(0)}</span>
+                <span className="cmp-expected">referência ≈ {entry.expected.toFixed(0)}</span>
               </div>
             ))}
           </div>
           <div className="comparison-note">
-            <span className="panel-label">COMO LER</span>
+            <span className="panel-label">MÉTODO DE COMPARAÇÃO</span>
             <p>
-              O paradoxo do aniversário prevê que uma colisão para uma saída de n bits ocorre após
-              aproximadamente 2<sup>n/2</sup> avaliações. Os valores acima são resultados
-              experimentais reais e podem variar entre execuções — a tendência, porém, é clara:
-              quanto maior a saída, maior o esforço necessário.
+              As barras mostram o número de avaliações até o primeiro valor repetido. A referência
+              2<sup>n/2</sup> indica a ordem de grandeza para saídas uniformes de n bits. A busca
+              produz o mesmo resultado quando o tamanho da saída e o estado inicial são mantidos.
             </p>
           </div>
         </>

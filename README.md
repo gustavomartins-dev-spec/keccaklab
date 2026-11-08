@@ -13,7 +13,7 @@ npm run dev
 
 Para gerar a versão de produção, execute `npm run build`. Para conferir essa versão localmente, execute `npm run preview`.
 
-O histórico usa as variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`. Sem elas, os experimentos continuam disponíveis, mas o histórico não é salvo no banco. O arquivo `.env.example` documenta as variáveis necessárias.
+As execuções são registradas no banco usando as variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`. Sem elas, os experimentos continuam disponíveis localmente. O histórico não é exibido na tela de busca de colisões. O arquivo `.env.example` documenta as variáveis necessárias.
 
 ## Banco local com Docker
 
@@ -94,7 +94,7 @@ src/
 │   ├── layout/             # Estrutura da aplicação, Sidebar e Topbar
 │   ├── keccak/             # Matriz, etapas e painel de transformação
 │   │   └── diagrams/       # Um componente para cada diagrama didático
-│   └── collisions/         # Controles, gráficos, resumo e histórico
+│   └── collisions/         # Controles, gráficos, resumo e comparação
 ├── modals/                 # Conteúdo dos modais específicos da aplicação
 ├── hooks/                  # Estado e ações dos módulos
 ├── services/               # Leitura, gravação e mapeamento de dados do Supabase

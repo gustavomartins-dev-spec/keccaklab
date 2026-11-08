@@ -6,15 +6,15 @@ export const STEP_DETAILS: StepDetail[] = [
     name: 'Entrada',
     title: 'Estado inicial',
     shortDescription:
-      'A mensagem é absorvida em uma matriz 5×5 de lanes de 8 bits. Ponto de partida — nenhuma transformação aplicada.',
+      'Estado inicial organizado em uma matriz 5×5 de lanes de 8 bits, antes da aplicação das transformações.',
     description:
-      'A mensagem é absorvida e disposta em uma matriz 5×5 de lanes. No Keccak-200, cada lane contém 8 bits (200 bits ÷ 25 posições = 8). Este é o ponto de partida — nenhuma transformação foi aplicada ainda.',
-    formula: 'A[x][y] ← mensagem absorvida',
-    effect: 'Nenhuma alteração. O estado reflete a entrada original antes de iniciar a rodada.',
+      'O estado inicial desta simulação é uma matriz fixa de 5×5 lanes. Cada lane contém 8 bits, totalizando 200 bits. Nenhuma transformação foi aplicada neste estágio.',
+    formula: 'A[x][y] ← matriz inicial',
+    effect: 'Define o estado de entrada da rodada, sem aplicar transformações.',
     steps: [
-      'A mensagem é dividida em blocos de 8 bits.',
-      'Cada bloco é colocado em uma posição (x, y) da matriz 5×5.',
-      'O estado agora tem 25 lanes × 8 bits = 200 bits totais.',
+      'Carrega os 25 valores de 8 bits da matriz inicial.',
+      'Cada valor ocupa uma posição (x, y) da matriz 5×5.',
+      'O estado contém 25 lanes × 8 bits = 200 bits.',
     ],
   },
   {
@@ -40,12 +40,12 @@ export const STEP_DETAILS: StepDetail[] = [
     name: 'Rho',
     title: 'Rotação de bits dentro de cada lane',
     shortDescription:
-      'Cada lane é rotacionada por um deslocamento que depende de sua posição (x, y). Bits que saem reentram do outro lado.',
+      'Aplica uma rotação circular de bits em cada lane, com deslocamento definido pela posição (x, y).',
     description:
-      'Cada lane é rotacionada por um deslocamento que depende de sua posição (x, y). O deslocamento segue uma tabela fixa definida na especificação do Keccak: r = (x + 2y) mod 7. Bits que saem pela esquerda reentram pela direita, preservando o número total de bits em cada lane.',
+      'Cada lane é rotacionada por um deslocamento que depende de sua posição (x, y). Nesta simulação, o deslocamento é r = (x + 2y) mod 7. A rotação é circular à esquerda e preserva o número de bits da lane.',
     formula: 'A′[x,y] = ROT(A[x,y], r[x,y])\nonde r[x,y] = (x + 2y) mod 7',
     effect:
-      'Espalha bits dentro de cada lane em magnitudes diferentes, quebrando alinhamentos entre colunas e aumentando a difusão iniciada por θ.',
+      'Altera a posição dos bits dentro das lanes e seus alinhamentos entre colunas.',
     steps: [
       'Cada lane A[x,y] é rotacionada em r[x,y] bits.',
       'O deslocamento r depende da posição: r = (x + 2y) mod 7.',
@@ -74,14 +74,14 @@ export const STEP_DETAILS: StepDetail[] = [
     name: 'Chi',
     title: 'Substituição não-linear entre vizinhos',
     shortDescription:
-      'A única etapa não-linear. Combina cada lane com as duas próximas usando NOT e AND, criando confusão.',
+      'Combina cada lane com as duas seguintes na mesma linha usando XOR, NOT e AND. O termo com AND introduz não linearidade.',
     description:
-      'É a única operação não-linear da rodada. Processa cada uma das 5 linhas da matriz: cada lane de saída é calculada combinando a lane atual com as duas próximas lanes da mesma linha, usando XOR, NOT e AND. O AND introduz uma interação multiplicativa entre bits, criando não-linearidade. Sem esta etapa, a função de rodada seria inteiramente linear e trivialmente reversível.',
+      'Processa cada uma das 5 linhas da matriz. Cada lane de saída combina a lane atual com as duas seguintes, usando XOR, NOT e AND. O termo com AND torna a operação não linear. Os índices das lanes são calculados módulo 5.',
     formula: 'A′[x,y] = A[x,y] ⊕ (¬A[x+1,y] ∧ A[x+2,y])',
     effect:
-      'Introduz não-linearidade (grau algébrico 2) na rodada. O AND atua como uma "condição": o resultado só é 1 se a próxima lane tiver 0 E a lane seguinte tiver 1. É o ingrediente que impede a rodada inteira de ser uma transformação linear.',
+      'Introduz termos de grau algébrico 2. Em cada posição de bit, o termo (¬b) ∧ c é 1 quando b = 0 e c = 1.',
     steps: [
-      'Para cada lane, pega as duas próximas lanes da mesma linha.',
+      'Para cada lane, seleciona as duas seguintes da mesma linha.',
       'Calcula (NOT próxima) AND (seguinte).',
       'Faz XOR do resultado com a lane atual.',
       'Repete para todas as 5 lanes de cada linha (índices módulo 5).',

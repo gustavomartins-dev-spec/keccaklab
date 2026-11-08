@@ -11,9 +11,7 @@ export type IconName =
   | 'pause'
   | 'reset'
   | 'book'
-  | 'sun'
   | 'check'
-  | 'sparkles'
   | 'info'
   | 'close';
 
@@ -58,18 +56,7 @@ const paths: Record<IconName, ReactNode> = {
       <path d="M12 5v16M3 4h5a4 4 0 0 1 4 3 4 4 0 0 1 4-3h5v15h-5a4 4 0 0 0-4 2 4 4 0 0 0-4-2H3Z" />
     </>
   ),
-  sun: (
-    <>
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5" />
-    </>
-  ),
   check: <path d="m5 12 4 4L19 6" />,
-  sparkles: (
-    <>
-      <path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5ZM20 2v4M18 4h4" />
-    </>
-  ),
   info: (
     <>
       <circle cx="12" cy="12" r="9" />

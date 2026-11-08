@@ -69,7 +69,7 @@ export default function ComparisonChart({ comparison }: ComparisonChartProps) {
           <i className="legend-dot actual" /> iterações experimentais
         </span>
         <span>
-          <i className="legend-dot expected" /> esperado teórico (2ⁿ/²)
+          <i className="legend-dot expected" /> referência teórica (2ⁿ/²)
         </span>
       </div>
     </>

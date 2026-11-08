@@ -1,5 +1,5 @@
 export const KECCAK_STEPS = [
-  { label: 'Entrada', symbol: '↳', caption: 'O ponto de partida' },
+  { label: 'Entrada', symbol: '↳', caption: 'Estado inicial' },
   { label: 'Theta', symbol: 'θ', caption: 'Difusão' },
   { label: 'Rho', symbol: 'ρ', caption: 'Rotação' },
   { label: 'Pi', symbol: 'π', caption: 'Permutação' },

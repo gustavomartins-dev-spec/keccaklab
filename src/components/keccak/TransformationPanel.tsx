@@ -25,7 +25,7 @@ export default function TransformationPanel({
       <div className="explain-top">
         <div className="explain-label">
           <span className="section-kicker">
-            {step === 0 ? 'ANTES DE COMEÇAR' : `TRANSFORMAÇÃO ${String(step).padStart(2, '0')}`}
+            {step === 0 ? 'ESTADO INICIAL' : `TRANSFORMAÇÃO ${String(step).padStart(2, '0')}`}
           </span>
           <span className="step-count">{String(step + 1).padStart(2, '0')} / 06</span>
         </div>
@@ -33,19 +33,19 @@ export default function TransformationPanel({
         <h3>{detail.title}</h3>
         <p className="detail-description">{detail.shortDescription}</p>
         <div className="formula-box">
-          <span className="panel-label">A MATEMÁTICA POR TRÁS</span>
+          <span className="panel-label">FÓRMULA</span>
           <code>{detail.formula}</code>
         </div>
         <button className="detail-button" onClick={onOpenDetails}>
-          Explorar esta transformação <Icon name="arrow-right" size={16} />
+          Detalhes da transformação <Icon name="arrow-right" size={16} />
         </button>
       </div>
       {cellChanges.length === 0 ? (
         <div className="initial-insight">
           <Icon name="info" size={18} />
           <p>
-            Este é o ponto de partida. Avance para <strong>Theta</strong> e veja como os primeiros
-            bits se transformam.
+            Estado anterior à aplicação de <strong>Theta</strong>. Nenhuma transformação foi
+            aplicada.
           </p>
         </div>
       ) : (
@@ -82,7 +82,7 @@ export default function TransformationPanel({
               ? 'Reproduzir novamente'
               : 'Reproduzir rodada'}
         </button>
-        <span className="player-hint">As transformações acontecem em sequência.</span>
+        <span className="player-hint">Ordem: θ → ρ → π → χ → ι.</span>
       </div>
     </div>
   );

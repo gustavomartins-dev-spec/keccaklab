@@ -18,8 +18,8 @@ export default function ExperimentControls({
   return (
     <div className="rho-toolbar">
       <div className="bits-control">
-        <span className="control-label">Configure seu experimento</span>
-        <p className="control-description">Escolha o tamanho da saída do hash.</p>
+        <span className="control-label">Parâmetros da busca</span>
+        <p className="control-description">Tamanho da saída do hash em bits.</p>
         <div className="bits-options">
           {BIT_OPTIONS.map((option) => (
             <button
