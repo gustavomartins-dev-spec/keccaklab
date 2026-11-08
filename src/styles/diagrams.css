@@ -1,0 +1,261 @@
+/* Step diagrams */
+.diagram {
+  background: var(--panel-2);
+  border: 1px solid var(--line-soft);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.diagram-label {
+  font: 10px var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.diagram-note {
+  font: 11px var(--mono);
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+.diagram-arrow {
+  text-align: center;
+  font-size: 14px;
+  color: var(--accent);
+  opacity: .6;
+}
+.diagram-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Theta diagram */
+.parity-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.parity-cell {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 8px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.parity-index {
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.parity-cell strong {
+  font: 14px var(--mono);
+  color: var(--text);
+  font-weight: 500;
+}
+.d-cell {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Rho diagram */
+.offset-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.offset-cell {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 8px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.offset-coord {
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.offset-cell strong {
+  font: 13px var(--mono);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Pi diagram */
+.pi-map-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pi-map-item {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 6px 9px;
+  font: 10px var(--mono);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.pi-from { color: var(--muted); }
+.pi-arrow { color: var(--accent); }
+.pi-to { color: var(--text); font-weight: 500; }
+.pi-more {
+  font: 10px var(--mono);
+  color: var(--muted);
+  padding: 6px 0;
+}
+
+/* Chi diagram */
+.chi-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.chi-lane-group {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 10px;
+}
+.chi-lane-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.chi-lane {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px;
+  border: 1px solid var(--line-soft);
+  text-align: center;
+}
+.chi-lane span {
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.chi-lane strong {
+  font: 13px var(--mono);
+  font-weight: 500;
+}
+.chi-lane.current strong { color: var(--text); }
+.chi-lane.next strong { color: var(--accent-2); }
+.chi-lane.after strong { color: var(--accent); }
+.chi-ops {
+  display: flex;
+  gap: 10px;
+  font: 10px var(--mono);
+  color: var(--text-soft);
+}
+.chi-op {
+  background: var(--panel-2);
+  padding: 4px 8px;
+  border-left: 2px solid var(--accent);
+}
+
+/* Iota diagram */
+.iota-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+.iota-cell {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 10px 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.iota-cell .iota-label {
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.iota-cell strong {
+  font: 16px var(--mono);
+  color: var(--text);
+  font-weight: 500;
+}
+.rc-cell {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.rc-cell strong { color: var(--accent); }
+.iota-op {
+  font: 16px var(--mono);
+  color: var(--accent);
+}
+.iota-constants {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rc-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.rc-item {
+  font: 10px var(--mono);
+  color: var(--text-soft);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 4px 8px;
+}
+
+/* Entry diagram */
+.entry-structure {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.entry-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  flex: 1;
+}
+.entry-cell {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 10px 4px;
+  text-align: center;
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.entry-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font: 11px var(--mono);
+  color: var(--text-soft);
+}
+.entry-info strong { color: var(--accent); }
+
+/* Steps list */
+.steps-box {
+  background: var(--panel-2);
+  border-left: 2px solid var(--accent-2);
+  padding: 14px 16px;
+}
+.steps-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.steps-list li {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-soft);
+}

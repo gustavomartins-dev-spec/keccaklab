@@ -1,0 +1,24 @@
+/* Transformation details */
+.diagram { border-radius: 11px; }
+.parity-cell, .offset-cell, .pi-map-item, .chi-lane-group, .chi-lane, .iota-cell, .rc-item, .entry-cell { border-radius: 6px; }
+.diagram-label { letter-spacing: .5px; line-height: 1.7; }
+.diagram-note { font: 11px/1.8 'DM Sans', sans-serif; }
+.modal-overlay { position: fixed; inset: 0; background: #24203755; backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; animation: modal-fade .2s ease; }
+.modal-content { background: white; border: 1px solid var(--line); border-radius: 20px; width: 100%; max-width: 760px; max-height: 88dvh; overflow-y: auto; box-shadow: 0 24px 90px #2a1d4c30; animation: modal-slide .25s ease; }
+.modal-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; padding: 27px 28px 23px; border-bottom: 1px solid var(--line-soft); }
+.modal-header-left { display: flex; flex-direction: column; gap: 16px; }
+.modal-title-row { display: flex; align-items: center; gap: 16px; }
+.modal-symbol { flex-shrink: 0; margin: 0; }
+.modal-header h2 { font-size: 21px; line-height: 1.35; font-weight: 650; letter-spacing: -.5px; margin: 0; }
+.modal-subtitle { display: block; font-size: 10px; color: var(--muted); margin-top: 5px; }
+.modal-close { display: grid; place-items: center; flex-shrink: 0; width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--line); background: #f9f7fc; color: var(--muted); }
+.modal-close:hover { background: var(--accent-soft); color: var(--accent); }
+.modal-body { display: flex; flex-direction: column; gap: 17px; padding: 23px 28px 28px; }
+.modal-description { font-size: 13px; line-height: 1.85; color: var(--text-soft); margin: 0; }
+.modal-formula, .modal-effect, .modal-steps { background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 10px; padding: 15px 17px; }
+.modal-formula code { display: block; font: 11px/1.8 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; color: #77618e; margin-top: 8px; }
+.modal-effect p { font-size: 12px; line-height: 1.8; color: var(--text-soft); margin: 8px 0 0; }
+.steps-list { padding-left: 18px; margin: 9px 0 0; display: grid; gap: 7px; }
+.steps-list li { font-size: 12px; line-height: 1.75; color: var(--text-soft); }
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-slide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }

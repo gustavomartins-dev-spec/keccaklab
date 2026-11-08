@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;650;700;750;800&display=swap');
+
+:root {
+  font-family: 'DM Sans', sans-serif;
+  color: #29263d;
+  background: #f8f9fc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+  --bg: #f8f9fc;
+  --panel: #ffffff;
+  --panel-2: #f7f7fc;
+  --line: #e7e7f0;
+  --line-soft: #eeeeF5;
+  --muted: #77758b;
+  --text: #29263d;
+  --text-soft: #666379;
+  --accent: #7952df;
+  --accent-hover: #6840ce;
+  --accent-soft: #f0eafa;
+  --accent-2: #27a88c;
+  --mono: 'DM Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; background: var(--bg); }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button { transition: background .18s, border-color .18s, color .18s, box-shadow .18s; }
+button:disabled { cursor: default; opacity: .4; }
+button:focus-visible, a:focus-visible { outline: 3px solid #b39aef; outline-offset: 4px; }
+button svg { flex-shrink: 0; }
+::selection { background: #e7dcfc; }
+.skip-link { position: fixed; z-index: 200; top: 12px; left: 12px; padding: 12px 18px; border-radius: 10px; background: var(--accent); color: white; transform: translateY(-150%); }
+.skip-link:focus { transform: translateY(0); }
+.app-shell { display: flex; min-height: 100vh; }

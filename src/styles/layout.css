@@ -1,0 +1,67 @@
+/* Navigation */
+.sidebar { width: 252px; flex: 0 0 252px; position: sticky; top: 0; height: 100dvh; padding: 32px 20px 18px; border-right: 1px solid var(--line); background: white; display: flex; flex-direction: column; overflow-y: auto; }
+.brand-lockup { display: flex; align-items: center; gap: 10px; padding: 0 8px; }
+.brand-mark { width: 43px; height: 45px; background: var(--accent); border-radius: 14px; color: white; display: grid; place-items: center; box-shadow: 0 4px 0 #e9e0fa; transform: rotate(-5deg); }
+.brand-mark svg { transform: rotate(5deg); }
+.brand-lockup strong { display: flex; align-items: baseline; font-size: 23px; font-weight: 800; letter-spacing: -1px; line-height: 1.2; }
+.brand-lockup strong span { color: var(--accent); font-weight: 500; }
+.brand-lockup strong i { width: 5px; height: 5px; margin-left: 3px; background: var(--accent-2); border-radius: 50%; }
+.brand-lockup small { display: block; color: var(--muted); font-size: 10px; margin-top: 4px; letter-spacing: .1px; }
+.sidebar-section-label { color: #9692a8; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; margin: 45px 12px 15px; }
+.main-nav { display: grid; gap: 7px; }
+.nav-item { background: transparent; border: 1px solid transparent; border-radius: 11px; padding: 13px 12px; display: flex; align-items: center; gap: 11px; text-align: left; color: var(--text-soft); font-size: 12px; font-weight: 600; }
+.nav-item:hover { background: var(--panel-2); }
+.nav-item.active { color: var(--accent); background: var(--accent-soft); border-color: #e7dcfa; }
+.nav-arrow { margin-left: auto; opacity: 0; }
+.nav-item.active .nav-arrow { opacity: 1; }
+.sidebar-journey { margin: 2px 12px 20px; }
+.sidebar-journey .sidebar-section-label { margin: 32px 0 20px; }
+.journey-heading { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; }
+.journey-heading svg { color: var(--muted); }
+.journey-progress { height: 5px; margin: 16px 0 9px; border-radius: 10px; background: #eeedf5; overflow: hidden; }
+.journey-progress span { display: block; height: 100%; background: var(--accent); border-radius: inherit; transition: width .35s; }
+.journey-caption { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); }
+.journey-caption strong { color: var(--accent); font-weight: 600; }
+.journey-steps { margin-top: 18px; display: grid; gap: 3px; }
+.journey-step { position: relative; display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 7px 3px; text-align: left; font-size: 11px; color: var(--muted); border-radius: 6px; }
+.journey-step:hover { background: var(--panel-2); color: var(--accent); }
+.journey-step:not(:last-child)::after { content: ''; position: absolute; width: 1px; height: 10px; top: 27px; left: 12px; background: var(--line); }
+.journey-dot { width: 20px; height: 20px; display: grid; place-items: center; background: white; border: 1px solid var(--line); border-radius: 50%; font: 8px var(--mono); }
+.journey-step.visited { color: var(--accent); }
+.journey-step.visited .journey-dot { color: white; border-color: var(--accent); background: var(--accent); }
+.journey-step[aria-current='step'] { font-weight: 700; }
+.journey-greek { font-family: Georgia, serif; font-size: 16px; margin-left: auto; color: #b6b1c6; }
+.sidebar-bottom { margin-top: auto; padding-top: 20px; }
+.sidebar-tip { background: #f7f4fd; border: 1px solid #eee7fa; border-radius: 13px; padding: 17px 15px; }
+.tip-icon { display: block; color: var(--accent); margin-bottom: 11px; }
+.sidebar-tip strong { font-size: 11px; }
+.sidebar-tip p { color: var(--muted); font-size: 10px; line-height: 1.8; margin: 7px 0 12px; }
+.tip-tag { color: var(--accent); font-size: 9px; font-weight: 600; }
+.sidebar-footer { display: flex; align-items: center; gap: 6px; margin: 22px 7px 0; color: var(--muted); font-size: 9px; }
+.sidebar-footer > span:last-child { margin-left: auto; color: #a6a2b4; }
+.pulse-dot { display: inline-block; flex-shrink: 0; width: 6px; height: 6px; background: var(--accent-2); border-radius: 50%; }
+
+/* Page */
+.main-content { flex: 1; min-width: 0; outline: none; }
+.topbar { height: 76px; border-bottom: 1px solid var(--line); background: #ffffffb3; padding: 0 42px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.breadcrumb { display: flex; align-items: center; gap: 13px; font-size: 11px; color: #8d899e; }
+.breadcrumb > svg:first-child { color: var(--muted); }
+.breadcrumb strong { color: var(--text-soft); font-weight: 500; }
+.topbar-meta { display: flex; align-items: center; gap: 23px; font-size: 10px; }
+.algorithm-badge { display: flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 7px; background: white; padding: 7px 10px; font-size: 9px; color: var(--text-soft); }
+.theme-label { display: flex; align-items: center; gap: 7px; color: var(--muted); }
+.theme-label svg { color: #a69a79; }
+.page { max-width: 1400px; margin: 0 auto; padding: 39px 42px 22px; }
+.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 35px; }
+.section-kicker { display: inline-flex; align-items: center; gap: 7px; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; color: var(--accent); }
+.section-kicker > span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
+h1 { font-size: clamp(28px, 2.9vw, 43px); line-height: 1.2; letter-spacing: -1.6px; font-weight: 750; margin: 13px 0 12px; }
+h1 em { font-style: normal; color: var(--accent); }
+.heading-description { font-size: 13px; line-height: 1.9; color: var(--muted); margin: 0; }
+.lesson-badge { display: flex; align-items: center; gap: 12px; flex-shrink: 0; padding: 15px 0 0 12px; }
+.lesson-badge-icon { width: 54px; height: 54px; display: grid; place-items: center; background: #eeE9fc; color: var(--accent); border-radius: 17px; border: 5px solid #f4f0fd; transform: rotate(-7deg); }
+.lesson-badge strong { display: block; font-size: 11px; margin-bottom: 6px; font-weight: 600; }
+.lesson-badge div > span { color: var(--muted); font-size: 10px; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; gap: 20px; }
+.section-heading h2 { font-size: 13px; font-weight: 650; margin: 0; }
+.section-heading > span { display: flex; align-items: center; gap: 8px; font-size: 9px; color: var(--muted); }
