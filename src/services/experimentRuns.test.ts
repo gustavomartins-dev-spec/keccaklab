@@ -22,11 +22,11 @@ vi.mock('../lib/supabase', () => ({
 
 const row = {
   id: 'database-run',
-  output_bits: 6,
+  output_bits: 8,
   cycle_length: 2,
   created_at: '2026-11-07T15:00:00.000Z',
 };
-const record = { id: row.id, bits: 6, cycleLength: 2, createdAt: row.created_at };
+const record = { id: row.id, bits: 8, cycleLength: 2, createdAt: row.created_at };
 
 beforeEach(() => {
   mocks.client = mocks.connectedClient;
@@ -56,13 +56,21 @@ describe('serviço de experimentos', () => {
   it('grava os metadados da colisão e converte o registro retornado', async () => {
     mocks.query.maybeSingle.mockResolvedValueOnce({ data: row });
 
-    await expect(saveExperimentRun(6, collisionFixture)).resolves.toEqual(record);
+    await expect(saveExperimentRun(8, collisionFixture)).resolves.toEqual(record);
     expect(mocks.query.insert).toHaveBeenCalledExactlyOnceWith({
-      output_bits: 6,
-      iterations: 3,
-      cycle_start: 0,
-      cycle_length: 2,
-      collision_index: 2,
+      output_bits: 8,
+      hash_algorithm: 'keccak-f200-floyd-v1',
+      iterations: collisionFixture.collisionIndex,
+      cycle_start: collisionFixture.cycleStart,
+      cycle_length: collisionFixture.cycleLength,
+      collision_index: collisionFixture.collisionIndex,
+      seed: collisionFixture.seed,
+      requested_seed: collisionFixture.requestedSeed,
+      collision_input_a: collisionFixture.collisionInputs[0],
+      collision_input_b: collisionFixture.collisionInputs[1],
+      collision_value: collisionFixture.collisionValue,
+      hash_evaluations: collisionFixture.evaluations,
+      search_attempts: collisionFixture.attempts,
     });
   });
 
@@ -71,7 +79,7 @@ describe('serviço de experimentos', () => {
       data: null,
       error: { message: 'Indisponível' },
     });
-    await expect(saveExperimentRun(4, collisionFixture)).resolves.toBeNull();
+    await expect(saveExperimentRun(4, collisionFixture)).rejects.toThrow('Indisponível');
   });
 
   it('oferece o modo local sem tentar acessar um cliente não configurado', async () => {

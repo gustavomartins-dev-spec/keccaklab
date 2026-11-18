@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { getStateAtStep } from '../lib/keccak';
 import StepDiagram from '../components/keccak/diagrams/StepDiagram';
 import Modal from '../components/ui/Modal';
 import type { Matrix, StepDetail } from '../types/keccak';
@@ -36,7 +37,7 @@ export default function TransformationModal({
       }
     >
       <p className="modal-description">{detail.description}</p>
-      <StepDiagram step={step} matrix={matrix} />
+      <StepDiagram step={step} matrix={step > 0 ? getStateAtStep(step - 1) : matrix} />
       <div className="modal-formula">
         <span className="panel-label">FÓRMULA</span>
         <code>{detail.formula}</code>

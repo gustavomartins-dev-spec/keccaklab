@@ -35,17 +35,26 @@ export async function saveExperimentRun(
 ): Promise<RunRecord | null> {
   if (!supabase) return null;
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('experiment_runs')
     .insert({
       output_bits: bits,
-      iterations: result.points.length,
+      hash_algorithm: 'keccak-f200-floyd-v1',
+      iterations: result.collisionIndex,
       cycle_start: result.cycleStart,
       cycle_length: result.cycleLength,
       collision_index: result.collisionIndex,
+      seed: result.seed,
+      requested_seed: result.requestedSeed,
+      collision_input_a: result.collisionInputs[0],
+      collision_input_b: result.collisionInputs[1],
+      collision_value: result.collisionValue,
+      hash_evaluations: result.evaluations,
+      search_attempts: result.attempts,
     })
     .select()
     .maybeSingle();
 
+  if (error) throw new Error('Falha ao salvar o experimento: ' + error.message);
   return data ? toRunRecord(data) : null;
 }

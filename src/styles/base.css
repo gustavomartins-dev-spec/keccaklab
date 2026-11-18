@@ -13,13 +13,13 @@
   --panel-2: #f7f7fc;
   --line: #e7e7f0;
   --line-soft: #eeeeF5;
-  --muted: #77758b;
+  --muted: #6c637b;
   --text: #29263d;
   --text-soft: #666379;
-  --accent: #7952df;
-  --accent-hover: #6840ce;
+  --accent: #6e43cf;
+  --accent-hover: #5d32bd;
   --accent-soft: #f0eafa;
-  --accent-2: #27a88c;
+  --accent-2: #16745f;
   --mono: 'DM Mono', monospace;
 }
 
@@ -29,9 +29,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; color: inherit; cursor: pointer; }
 button { transition: background .18s, border-color .18s, color .18s, box-shadow .18s; }
 button:disabled { cursor: default; opacity: .4; }
-button:focus-visible, a:focus-visible { outline: 3px solid #b39aef; outline-offset: 4px; }
+button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible, [tabindex='0']:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
 button svg { flex-shrink: 0; }
-::selection { background: #e7dcfc; }
+::selection { background: #e7dcfc; color: var(--text); }
 .skip-link { position: fixed; z-index: 200; top: 12px; left: 12px; padding: 12px 18px; border-radius: 10px; background: var(--accent); color: white; transform: translateY(-150%); }
 .skip-link:focus { transform: translateY(0); }
 .app-shell { display: flex; min-height: 100vh; }

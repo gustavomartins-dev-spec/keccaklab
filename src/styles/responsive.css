@@ -147,3 +147,17 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+@media (max-width: 700px) {
+  .search-actions { margin-top: 16px; }
+  .search-actions .run-button, .search-actions .secondary-button { width: 100%; }
+  .seed-control { align-items: flex-start; flex-direction: column; }
+  .seed-control input { width: 100%; }
+  .bits-options .bit-option { flex: 0 1 calc(25% - 6px); }
+  .rho-info { grid-template-columns: 1fr; }
+  .rho-info .metric-card strong { font-size: 23px; }
+  .rho-info .metric-card span { font-size: 9px; }
+  .rho-info .metric-card small { font-size: 10px; }
+  .comparison-table { grid-template-columns: 1fr; }
+  .method-details { padding: 16px; }
+}

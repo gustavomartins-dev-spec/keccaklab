@@ -15,6 +15,18 @@ Para gerar a versão de produção, execute `npm run build`. Para conferir essa 
 
 As execuções são registradas no banco usando as variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`. Sem elas, os experimentos continuam disponíveis localmente. O histórico não é exibido na tela de busca de colisões. O arquivo `.env.example` documenta as variáveis necessárias.
 
+## Módulo de colisões e Keccak-200
+
+O visualizador aplica as cinco etapas oficiais da primeira rodada de Keccak-f[200]. A busca usa esse mesmo núcleo dentro de uma esponja didática Keccak[r=120,c=80], com 18 rodadas, preenchimento pad10*1 e sufixo 0x01. Esta instância de 200 bits não é SHA3-256 nem outra função SHA-3 padronizada.
+
+O segundo módulo oferece saídas de 4, 6, 8, 12, 16, 20, 24, 28, 32, 36 e 40 bits, semente configurável, progresso e cancelamento. Floyd encontra o ciclo em memória constante, recupera duas entradas distintas e verifica seus resumos antes de apresentar a colisão. Buscas grandes e a comparação de múltiplas sementes rodam em Web Worker. Cada busca tem limite de 20 milhões de avaliações e até 64 sementes; atingir o limite produz uma mensagem, sem fabricar um resultado.
+
+A representação D3 mostra cauda e ciclo e reproduz os ponteiros de Floyd. Ela usa no máximo 24 nós e 49 quadros, em uma etapa separada da busca. Trechos omitidos e saltos da reprodução são identificados. A comparação usa cinco sementes para cada saída de 8, 16 e 24 bits e distingue passos da trajetória de avaliações efetivas de h.
+
+A metodologia, a codificação da entrada e o pseudocódigo estão em [docs/metodologia-keccak-rho.md](docs/metodologia-keccak-rho.md).
+
+Para bancos existentes, aplique a nova migration com o fluxo local abaixo. A migration amplia os tamanhos permitidos, armazena o par da colisão e marca os registros anteriores como legacy-toy. O resultado continua disponível localmente se o histórico não puder ser salvo.
+
 ## Banco local com Docker
 
 O projeto usa o Supabase CLI 3.0.0, fixado como dependência de desenvolvimento. O CLI gerencia os containers com PostgreSQL, API, Auth e Studio. Realtime, Storage, servidor de e-mail, Edge Functions e Analytics ficam desativados porque não são utilizados pelo laboratório. Veja o [fluxo oficial de desenvolvimento local](https://supabase.com/docs/guides/local-development).
@@ -77,7 +89,7 @@ npm run test:coverage
 
 A suíte usa Vitest, React Testing Library, jest-dom e user-event. Os testes ficam ao lado dos módulos, em arquivos `.test.ts` e `.test.tsx`; `src/test/` contém a configuração compartilhada e as fixtures. O Vitest 3 integra os testes à configuração do Vite 5 ([documentação](https://v3.vitest.dev/guide/)).
 
-Os testes cobrem as propriedades das transformações da implementação didática, a busca de colisões, os temporizadores dos hooks, o histórico, o modo local sem credenciais, a navegação entre telas e o foco dos modais. O Supabase é simulado; a suíte não precisa do `.env` nem de um banco disponível. Os testes de interface usam jsdom e verificam interações e conteúdo; a aparência e a responsividade visual são verificadas no navegador.
+Os testes conferem Keccak-f[200] contra os vetores oficiais XKCP, a esponja nos limites dos blocos, a codificação de 40 bits, a recuperação de colisões com Floyd, o cancelamento dos workers, os temporizadores dos hooks, o histórico, o modo local sem credenciais, a navegação entre telas e o foco dos modais. O Supabase é simulado; a suíte não precisa do `.env` nem de um banco disponível. Os testes de interface usam jsdom e verificam interações e conteúdo; a aparência e a responsividade visual são verificadas no navegador.
 
 A cobertura exige pelo menos 85% de linhas, instruções e funções e 80% de ramificações. O ponto de inicialização do React, os tipos, os próprios testes e o mapa estático dos ícones ficam fora da medição.
 

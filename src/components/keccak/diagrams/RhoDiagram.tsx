@@ -4,7 +4,7 @@ export default function RhoDiagram() {
   const offsets = getRhoOffsets();
   return (
     <div className="diagram rho-diagram">
-      <span className="diagram-label">Tabela de deslocamentos r[x,y] = (x + 2y) mod 7</span>
+      <span className="diagram-label">Deslocamentos oficiais r[x,y] mod 8</span>
       <div className="offset-grid">
         {offsets.map((row, y) =>
           row.map((offset, x) => (

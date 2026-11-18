@@ -42,13 +42,13 @@ export const STEP_DETAILS: StepDetail[] = [
     shortDescription:
       'Aplica uma rotação circular de bits em cada lane, com deslocamento definido pela posição (x, y).',
     description:
-      'Cada lane é rotacionada por um deslocamento que depende de sua posição (x, y). Nesta simulação, o deslocamento é r = (x + 2y) mod 7. A rotação é circular à esquerda e preserva o número de bits da lane.',
-    formula: 'A′[x,y] = ROT(A[x,y], r[x,y])\nonde r[x,y] = (x + 2y) mod 7',
+      'Cada lane é rotacionada por um deslocamento que depende de sua posição (x, y). Os deslocamentos oficiais de Keccak são reduzidos módulo 8, o tamanho de cada lane de Keccak-f[200]. A rotação é circular à esquerda e preserva o número de bits da lane.',
+    formula: 'A′[x,y] = ROT(A[x,y], r[x,y])\nonde r[x,y] = deslocamento oficial mod 8',
     effect:
       'Altera a posição dos bits dentro das lanes e seus alinhamentos entre colunas.',
     steps: [
       'Cada lane A[x,y] é rotacionada em r[x,y] bits.',
-      'O deslocamento r depende da posição: r = (x + 2y) mod 7.',
+      'Consulta o deslocamento oficial da posição (x, y), reduzido módulo 8.',
       'A rotação é circular: bits que saem de um lado reentram pelo outro.',
     ],
   },
@@ -60,7 +60,7 @@ export const STEP_DETAILS: StepDetail[] = [
       'Reposiciona as lanes dentro da matriz. Nenhum bit é alterado — apenas movido de lugar.',
     description:
       'Reposiciona as lanes dentro da matriz. A lane na posição (x, y) move para a posição (y, (2x + 3y) mod 5). Esta transposição troca linhas por colunas e vice-versa, redistribuindo bits que estavam alinhados em direções diferentes.',
-    formula: 'A′[y][(2x + 3y) mod 5] = A[x][y]',
+    formula: 'A′[y, (2x + 3y) mod 5] = A[x,y]',
     effect:
       'Garante que bits que estavam na mesma linha ou coluna sejam redistribuídos em direções diferentes, completando a difusão iniciada por θ e ρ.',
     steps: [
@@ -94,7 +94,7 @@ export const STEP_DETAILS: StepDetail[] = [
     shortDescription:
       'Faz XOR da lane A[0,0] com uma constante única por rodada. Impede que todas as rodadas sejam idênticas.',
     description:
-      'É a última etapa de cada rodada. Faz XOR entre a lane A[0,0] e uma constante de rodada RC[i] específica daquela rodada. No Keccak-200, como cada lane possui 8 bits, a constante é truncada para 8 bits. Como cada rodada utiliza uma constante diferente, o Iota impede que todas as rodadas tenham exatamente o mesmo comportamento, quebrando simetrias que poderiam existir na permutação.',
+      'É a última etapa de cada rodada. Faz XOR entre a lane A[0,0] e uma constante de rodada RC[i] específica daquela rodada. No Keccak-f[200], que possui 18 rodadas e lanes de 8 bits, a constante é truncada para 8 bits. Como cada rodada utiliza uma constante diferente, o Iota impede que todas as rodadas tenham exatamente o mesmo comportamento, quebrando simetrias que poderiam existir na permutação.',
     formula: 'A′[0][0] = A[0][0] ⊕ RC[i]',
     effect:
       'Quebra a simetria entre rodadas. Sem o Iota, todas as rodadas executariam exatamente as mesmas operações (θ→ρ→π→χ), criando uma estrutura simétrica explorável por atacantes. As constantes vêm de um LFSR e são predefinidas.',

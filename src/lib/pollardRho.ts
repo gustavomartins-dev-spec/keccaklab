@@ -1,44 +1,114 @@
-import type { RhoResult } from '../types/experiments';
+import { MAX_HASH_EVALUATIONS } from '../constants/experiments';
+import type { ComparisonEntry, OutputBits, RhoResult, SearchProgress } from '../types/experiments';
+import { createTruncatedKeccak200, validateOutputBits } from './keccak200';
 
-export const hashToBits = (input: number, bits: number): number => {
-  let value = (input ^ 0x9e3779b9) >>> 0;
-  for (let round = 0; round < 5; round += 1) {
-    value ^= value << 13;
-    value ^= value >>> 17;
-    value ^= value << 5;
-    value = Math.imul(value, 0x45d9f3b) >>> 0;
-  }
-  return value & ((1 << bits) - 1);
-};
+export const hashToBits = (input: number, bits: number): number => createTruncatedKeccak200(bits)(input);
 
-export const runPollardRho = (bits: number): RhoResult => {
-  const seen = new Map<number, number>();
-  const points: number[] = [];
-  let value = 7;
-  let collisionIndex = 0;
-  let collisionValue = 0;
-  for (let index = 0; index < 260; index += 1) {
-    value = hashToBits(value + 11, bits);
-    points.push(value);
-    const previous = seen.get(value);
-    if (previous !== undefined) {
-      collisionIndex = index;
-      collisionValue = value;
-      return {
-        points,
-        collisionIndex,
-        cycleStart: previous,
-        cycleLength: index - previous,
-        collisionValue,
-      };
-    }
-    seen.set(value, index);
+export interface SearchOptions {
+  seed?: number;
+  maxEvaluations?: number;
+  /** Injectable transition for testing cycle edge cases. */
+  transition?: (value: number) => number;
+}
+
+/** Floyd's algorithm. No visited-state table or trajectory is retained by the search. */
+export function* searchPollardRho(bits: number, options: SearchOptions = {}): Generator<SearchProgress, RhoResult> {
+  validateOutputBits(bits);
+  const requestedSeed = options.seed ?? 7;
+  const domainSize = 2 ** bits;
+  if (!Number.isSafeInteger(requestedSeed) || requestedSeed < 0 || requestedSeed >= domainSize) {
+    throw new RangeError('A semente deve caber na saída selecionada.');
   }
-  return {
-    points,
-    collisionIndex: points.length - 1,
-    cycleStart: 0,
-    cycleLength: points.length,
-    collisionValue: value,
+  const maxEvaluations = options.maxEvaluations ?? MAX_HASH_EVALUATIONS;
+  if (!Number.isSafeInteger(maxEvaluations) || maxEvaluations < 1) throw new RangeError('Limite de avaliações inválido.');
+  const hash = options.transition ?? createTruncatedKeccak200(bits);
+  let evaluations = 0;
+  let lastYield = 0;
+  const evaluate = (value: number): number => {
+    if (evaluations >= maxEvaluations) throw new Error('Limite de avaliações atingido. Tente outra semente ou uma saída menor.');
+    evaluations++;
+    const next = hash(value);
+    if (!Number.isSafeInteger(next) || next < 0 || next >= domainSize) throw new RangeError('A função de transição saiu do domínio.');
+    return next;
   };
-};
+  for (let attempts = 1; attempts <= Math.min(domainSize, 64); attempts++) {
+    const seed = (requestedSeed + attempts - 1) % domainSize;
+    let tortoise = evaluate(seed);
+    let hare = evaluate(evaluate(seed));
+    let meetingStep = 1;
+    const progress = (phase: SearchProgress['phase']): SearchProgress => ({phase, bits, seed, attempts, evaluations, tortoise, hare});
+    yield progress('detect');
+    while (tortoise !== hare) {
+      tortoise = evaluate(tortoise);
+      hare = evaluate(evaluate(hare));
+      meetingStep++;
+      if (evaluations - lastYield >= 1024) { lastYield = evaluations; yield progress('detect'); }
+    }
+    const meetingValue = tortoise;
+    tortoise = seed;
+    let cycleStart = 0;
+    let previousTortoise = seed;
+    let previousHare = hare;
+    while (tortoise !== hare) {
+      previousTortoise = tortoise;
+      previousHare = hare;
+      tortoise = evaluate(tortoise);
+      hare = evaluate(hare);
+      cycleStart++;
+      if (evaluations - lastYield >= 1024) { lastYield = evaluations; yield progress('locate'); }
+    }
+    // A seed already on the cycle gives no pair of distinct predecessors: restart.
+    if (cycleStart === 0) continue;
+    const collisionValue = tortoise;
+    let cycleLength = 1;
+    hare = evaluate(tortoise);
+    while (tortoise !== hare) {
+      hare = evaluate(hare);
+      cycleLength++;
+      if (evaluations - lastYield >= 1024) { lastYield = evaluations; yield progress('measure'); }
+    }
+    if (previousTortoise === previousHare || evaluate(previousTortoise) !== collisionValue || evaluate(previousHare) !== collisionValue) {
+      throw new Error('Não foi possível verificar o par de entradas da colisão.');
+    }
+    return { bits, requestedSeed, seed, attempts, evaluations, cycleStart, cycleLength,
+      collisionIndex: cycleStart + cycleLength, collisionValue,
+      collisionInputs: [previousTortoise, previousHare], meetingStep, meetingValue };
+  }
+  throw new Error('As sementes testadas entraram diretamente em ciclos. Tente outra semente.');
+}
+
+export function runPollardRho(bits: number, options: SearchOptions = {}): RhoResult {
+  const search = searchPollardRho(bits, options);
+  let next = search.next();
+  while (!next.done) next = search.next();
+  return next.value;
+}
+
+export function* comparePollardRho(sizes: readonly OutputBits[], trials: number): Generator<SearchProgress, ComparisonEntry[]> {
+  if (!Number.isInteger(trials) || trials < 1 || trials > 20) throw new RangeError('Número de amostras inválido.');
+  const entries: ComparisonEntry[] = [];
+  let completedTrials = 0;
+  for (const bits of sizes) {
+    let sum = 0;
+    let evaluations = 0;
+    let minIterations = Infinity;
+    let maxIterations = 0;
+    for (let trial = 0; trial < trials; trial++) {
+      const search = searchPollardRho(bits, { seed: (7 + 17 * trial) % 2 ** bits });
+      let next = search.next();
+      while (!next.done) {
+        yield { ...next.value, completedTrials, totalTrials: sizes.length * trials };
+        next = search.next();
+      }
+      const result = next.value;
+      sum += result.collisionIndex;
+      evaluations += result.evaluations;
+      minIterations = Math.min(minIterations, result.collisionIndex);
+      maxIterations = Math.max(maxIterations, result.collisionIndex);
+      completedTrials++;
+    }
+    entries.push({bits, trials, iterations: sum / trials, minIterations, maxIterations,
+      evaluations: evaluations / trials, expected: 2 ** (bits / 2)});
+  }
+  return entries;
+}

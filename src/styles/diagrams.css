@@ -23,7 +23,7 @@
   text-align: center;
   font-size: 14px;
   color: var(--accent);
-  opacity: .6;
+  opacity: 1;
 }
 .diagram-section {
   display: flex;

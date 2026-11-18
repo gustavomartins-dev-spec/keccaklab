@@ -24,7 +24,7 @@ export default function StepDiagram({ step, matrix }: StepDiagramProps) {
     case 4:
       return <ChiDiagram matrix={matrix} />;
     case 5:
-      return <IotaDiagram />;
+      return <IotaDiagram matrix={matrix} />;
     default:
       return null;
   }

@@ -76,7 +76,7 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
           <strong>Representação do estado</strong>
           <p>
             A simulação utiliza uma matriz de 5 × 5 lanes de 8 bits. As etapas são aplicadas na
-            ordem θ → ρ → π → χ → ι.
+            ordem θ → ρ → π → χ → ι, mostrando a primeira das 18 rodadas de Keccak-f[200]. O módulo de colisões utiliza este mesmo núcleo de transformações.
           </p>
         </div>
         <span className="footnote-tag">25 lanes × 8 bits</span>

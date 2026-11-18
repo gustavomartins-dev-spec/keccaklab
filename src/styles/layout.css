@@ -7,7 +7,7 @@
 .brand-lockup strong span { color: var(--accent); font-weight: 500; }
 .brand-lockup strong i { width: 5px; height: 5px; margin-left: 3px; background: var(--accent-2); border-radius: 50%; }
 .brand-lockup small { display: block; color: var(--muted); font-size: 10px; margin-top: 4px; letter-spacing: .1px; }
-.sidebar-section-label { color: #9692a8; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; margin: 45px 12px 15px; }
+.sidebar-section-label { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: 1.5px; margin: 45px 12px 15px; }
 .main-nav { display: grid; gap: 7px; }
 .nav-item { background: transparent; border: 1px solid transparent; border-radius: 11px; padding: 13px 12px; display: flex; align-items: center; gap: 11px; text-align: left; color: var(--text-soft); font-size: 12px; font-weight: 600; }
 .nav-item:hover { background: var(--panel-2); }
@@ -30,16 +30,16 @@
 .journey-step.visited { color: var(--accent); }
 .journey-step.visited .journey-dot { color: white; border-color: var(--accent); background: var(--accent); }
 .journey-step[aria-current='step'] { font-weight: 700; }
-.journey-greek { font-family: Georgia, serif; font-size: 16px; margin-left: auto; color: #b6b1c6; }
+.journey-greek { font-family: Georgia, serif; font-size: 16px; margin-left: auto; color: var(--muted); }
 .sidebar-bottom { margin-top: auto; padding-top: 20px; }
 .sidebar-footer { display: flex; align-items: center; gap: 6px; margin: 22px 7px 0; color: var(--muted); font-size: 9px; }
-.sidebar-footer > span:last-child { margin-left: auto; color: #a6a2b4; }
+.sidebar-footer > span:last-child { margin-left: auto; color: var(--muted); }
 .pulse-dot { display: inline-block; flex-shrink: 0; width: 6px; height: 6px; background: var(--accent-2); border-radius: 50%; }
 
 /* Page */
 .main-content { flex: 1; min-width: 0; outline: none; }
 .topbar { height: 76px; border-bottom: 1px solid var(--line); background: #ffffffb3; padding: 0 42px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-.breadcrumb { display: flex; align-items: center; gap: 13px; font-size: 11px; color: #8d899e; }
+.breadcrumb { display: flex; align-items: center; gap: 13px; font-size: 11px; color: var(--muted); }
 .breadcrumb > svg:first-child { color: var(--muted); }
 .breadcrumb strong { color: var(--text-soft); font-weight: 500; }
 .page { max-width: 1400px; margin: 0 auto; padding: 39px 42px 22px; }

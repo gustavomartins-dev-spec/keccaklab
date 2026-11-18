@@ -1,7 +1,8 @@
 import { getRoundConstant } from '../../../lib/keccak';
+import type { Matrix } from '../../../types/keccak';
 import { formatByte as toHex } from '../../../utils/format';
 
-export default function IotaDiagram() {
+export default function IotaDiagram({ matrix }: { matrix: Matrix }) {
   const rc = getRoundConstant(0);
   return (
     <div className="diagram iota-diagram">
@@ -9,7 +10,7 @@ export default function IotaDiagram() {
       <div className="iota-flow">
         <div className="iota-cell">
           <span className="iota-label">A[0,0] antes</span>
-          <strong>?</strong>
+          <strong>{toHex(matrix[0][0])}</strong>
         </div>
         <div className="iota-op">⊕</div>
         <div className="iota-cell rc-cell">
@@ -19,7 +20,7 @@ export default function IotaDiagram() {
         <div className="iota-op">=</div>
         <div className="iota-cell">
           <span className="iota-label">A[0,0] depois</span>
-          <strong>?</strong>
+          <strong>{toHex(matrix[0][0] ^ rc)}</strong>
         </div>
       </div>
       <div className="diagram-note">

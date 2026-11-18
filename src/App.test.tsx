@@ -3,13 +3,18 @@ import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getRecentRuns, saveExperimentRun } from './services/experimentRuns';
-import { createDeferred, createRun } from './test/fixtures';
+import { collisionFixture, comparisonFixture, createDeferred, createRun } from './test/fixtures';
 import type { RunRecord } from './types/experiments';
 import App from './App';
 
 vi.mock('./services/experimentRuns', () => ({
   getRecentRuns: vi.fn(),
   saveExperimentRun: vi.fn(),
+}));
+
+vi.mock('./services/collisionRunner', () => ({
+  startCollisionSearch: vi.fn((bits:number,seed:number) => ({promise:Promise.resolve({result:{...collisionFixture,bits,seed},elapsedMs:10}),cancel:vi.fn()})),
+  startCollisionComparison: vi.fn(() => ({promise:Promise.resolve({result:comparisonFixture,elapsedMs:20}),cancel:vi.fn()})),
 }));
 
 beforeEach(() => {
@@ -135,15 +140,15 @@ describe('fluxos do laboratório', () => {
     vi.mocked(saveExperimentRun).mockReturnValueOnce(pending.promise);
     const user = renderApp();
     await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
-    await user.click(screen.getByRole('button', { name: '8 bits' }));
+    await user.click(screen.getByRole('button', { name: '16 bits' }));
 
-    expect(screen.getByRole('button', { name: '8 bits' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByText('saída 6 bits')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '16 bits' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('saída 8 bits')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Executar busca' }));
 
-    expect(screen.getByText('saída 8 bits')).toBeInTheDocument();
+    expect(screen.getByText('saída 16 bits')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Salvando…' })).toBeDisabled();
-    expect(saveExperimentRun).toHaveBeenCalledExactlyOnceWith(8, expect.any(Object));
+    expect(saveExperimentRun).toHaveBeenCalledExactlyOnceWith(16, expect.any(Object));
     await act(async () => {
       pending.resolve(createRun({ bits: 8 }));
     });
@@ -152,18 +157,18 @@ describe('fluxos do laboratório', () => {
 
     await user.click(screen.getByRole('button', { name: 'Visualizador Keccak' }));
     await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
-    expect(screen.getByText('saída 8 bits')).toBeInTheDocument();
+    expect(screen.getByText('saída 16 bits')).toBeInTheDocument();
   });
 
   it('compara as três saídas e conserva a comparação ao trocar de tela', async () => {
     const user = renderApp();
     await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
-    const chartName = 'Gráfico comparando iterações por tamanho de saída';
+    const chartName = 'Gráfico comparando passos por tamanho de saída';
     expect(screen.queryByRole('img', { name: chartName })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Comparar tamanhos' }));
 
     const chart = screen.getByRole('img', { name: chartName });
-    for (const label of ['4 bits', '6 bits', '8 bits']) {
+    for (const label of ['8 bits', '16 bits', '24 bits']) {
       expect(within(chart).getByText(label)).toBeInTheDocument();
     }
     expect(saveExperimentRun).not.toHaveBeenCalled();

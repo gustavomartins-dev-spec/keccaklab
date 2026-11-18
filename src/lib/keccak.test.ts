@@ -51,6 +51,10 @@ describe('estado do visualizador Keccak', () => {
     expect(getChangedCellSet(0)).toEqual(new Set());
   });
 
+  it('aplica Iota apenas à lane A[0,0] com a primeira constante oficial', () => {
+    expect(getCellChanges(5)).toEqual([{ x: 0, y: 0, before: getStateAtStep(4)[0][0], after: getStateAtStep(4)[0][0] ^ 1 }]);
+  });
+
   it.each([1, 2, 3, 4, 5])(
     'localiza as alterações na etapa %i com coordenadas e valores corretos',
     (step) => {
@@ -102,11 +106,11 @@ describe('operações auxiliares do Keccak', () => {
     }
   });
 
-  it('usa as constantes de rodada e reinicia a tabela após 24 rodadas', () => {
+  it('usa as 18 constantes oficiais de Keccak-f[200]', () => {
     expect(getRoundConstant(0)).toBe(0x01);
     expect(getRoundConstant(1)).toBe(0x82);
-    expect(getRoundConstant(23)).toBe(0x8b);
-    expect(getRoundConstant(24)).toBe(0x01);
+    expect(getRoundConstant(17)).toBe(0x80);
+    expect(() => getRoundConstant(18)).toThrow(RangeError);
   });
 
   it('serializa os bytes com zeros à esquerda e na ordem das linhas', () => {
