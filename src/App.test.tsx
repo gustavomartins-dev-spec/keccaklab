@@ -163,7 +163,7 @@ describe('fluxos do laboratório', () => {
   it('compara as três saídas e conserva a comparação ao trocar de tela', async () => {
     const user = renderApp();
     await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
-    const chartName = 'Gráfico comparando passos por tamanho de saída';
+    const chartName = 'Gráfico comparando comprimento de ρ por tamanho de saída';
     expect(screen.queryByRole('img', { name: chartName })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Comparar tamanhos' }));
 

@@ -79,7 +79,7 @@ describe('casos de borda de Floyd',()=>{
       expect(entry.iterations).toBeGreaterThanOrEqual(entry.minIterations);
       expect(entry.iterations).toBeLessThanOrEqual(entry.maxIterations);
       expect(entry.evaluations).toBeGreaterThan(entry.iterations);
-      expect(entry.expected).toBe(2**(entry.bits/2));
+      expect(entry.expected).toBeCloseTo(Math.sqrt(Math.PI/2)*2**(entry.bits/2));
     }
   });
 });

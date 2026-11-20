@@ -108,7 +108,7 @@ export function* comparePollardRho(sizes: readonly OutputBits[], trials: number)
       completedTrials++;
     }
     entries.push({bits, trials, iterations: sum / trials, minIterations, maxIterations,
-      evaluations: evaluations / trials, expected: 2 ** (bits / 2)});
+      evaluations: evaluations / trials, expected: Math.sqrt(Math.PI / 2) * 2 ** (bits / 2)});
   }
   return entries;
 }

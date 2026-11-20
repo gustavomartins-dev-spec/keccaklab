@@ -8,13 +8,13 @@
   gap: 10px;
 }
 .diagram-label {
-  font: 10px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--accent);
 }
 .diagram-note {
-  font: 11px var(--mono);
+  font: 12px var(--mono);
   color: var(--muted);
   line-height: 1.5;
   margin-top: 4px;
@@ -47,7 +47,7 @@
   gap: 4px;
 }
 .parity-index {
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   color: var(--muted);
 }
 .parity-cell strong {
@@ -76,7 +76,7 @@
   gap: 4px;
 }
 .offset-coord {
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   color: var(--muted);
 }
 .offset-cell strong {
@@ -95,7 +95,7 @@
   background: var(--panel);
   border: 1px solid var(--line);
   padding: 6px 9px;
-  font: 10px var(--mono);
+  font: 12px var(--mono);
   display: flex;
   align-items: center;
   gap: 5px;
@@ -104,7 +104,7 @@
 .pi-arrow { color: var(--accent); }
 .pi-to { color: var(--text); font-weight: 500; }
 .pi-more {
-  font: 10px var(--mono);
+  font: 12px var(--mono);
   color: var(--muted);
   padding: 6px 0;
 }
@@ -135,7 +135,7 @@
   text-align: center;
 }
 .chi-lane span {
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   color: var(--muted);
 }
 .chi-lane strong {
@@ -148,7 +148,7 @@
 .chi-ops {
   display: flex;
   gap: 10px;
-  font: 10px var(--mono);
+  font: 12px var(--mono);
   color: var(--text-soft);
 }
 .chi-op {
@@ -175,7 +175,7 @@
   gap: 4px;
 }
 .iota-cell .iota-label {
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   color: var(--muted);
 }
 .iota-cell strong {
@@ -205,7 +205,7 @@
   gap: 6px;
 }
 .rc-item {
-  font: 10px var(--mono);
+  font: 12px var(--mono);
   color: var(--text-soft);
   background: var(--panel);
   border: 1px solid var(--line);
@@ -229,14 +229,14 @@
   border: 1px solid var(--line);
   padding: 10px 4px;
   text-align: center;
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   color: var(--muted);
 }
 .entry-info {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font: 11px var(--mono);
+  font: 12px var(--mono);
   color: var(--text-soft);
 }
 .entry-info strong { color: var(--accent); }

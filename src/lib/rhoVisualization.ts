@@ -18,7 +18,7 @@ export function buildRhoVisualization(result: RhoResult): { nodes: RhoNode[]; fr
       nodes.push({id: String(start + length - 1), index: start + length - 1, value: last, group});
     }
   };
-  appendGroup('tail', 0, result.cycleStart, result.seed, result.collisionInputs[0], 6);
+  appendGroup('tail', 0, result.cycleStart, result.seed, result.collisionInputs[0], 4);
   appendGroup('cycle', result.cycleStart, result.cycleLength, result.collisionValue, result.collisionInputs[1], 14);
   const frames: FloydFrame[] = [];
   let tortoise = result.seed;

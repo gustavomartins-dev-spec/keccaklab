@@ -11,7 +11,7 @@ export default function CollisionPage({experiment}: {experiment:CollisionExperim
       <div className="page-heading"><div><span className="section-kicker"><span/>POLLARD RHO PARA COLISÕES</span><h1>Busca de colisões</h1><p className="heading-description">Keccak-f[200] com saída truncada de 4 a 40 bits e detecção de ciclos por Floyd.</p></div></div>
       <ExperimentControls bits={bits} seed={seed} isSaving={isSaving} job={job} progress={progress} onBitsChange={setBits} onSeedChange={setSeed} onRun={execute} onCancel={cancel}/>
       {error && <p className="experiment-message" role="status">{error}</p>}
-      <div className="rho-layout"><CollisionChart result={result} bits={resultBits}/><CollisionSummary result={result} bits={resultBits} elapsedMs={elapsedMs}/></div>
+      <div className="rho-layout"><CollisionChart result={result}/><CollisionSummary result={result} bits={resultBits} elapsedMs={elapsedMs}/></div>
       <ComparisonSection comparison={comparison} onCompare={compare} busy={!!job || isSaving}/>
       <details className="method-details">
         <summary>Entenda o método e a ligação com o visualizador Keccak</summary>
