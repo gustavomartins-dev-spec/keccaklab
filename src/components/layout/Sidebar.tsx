@@ -85,6 +85,14 @@ export default function Sidebar({ activePage, step, onNavigate, onSelectStep }: 
         <div className="sidebar-footer">
           <span className="pulse-dot" /> Laboratório interativo <span>v1.0</span>
         </div>
+        <a
+          className="sidebar-source"
+          href="https://github.com/gustavomartins-dev-spec/keccaklab"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Código-fonte aberto · licença MIT
+        </a>
       </div>
     </aside>
   );

@@ -2,6 +2,10 @@
 
 Laboratório interativo de criptografia feito com React, TypeScript e Vite.
 
+**Acesse no navegador:** <https://keccaklab.vercel.app>. Não é preciso instalar nada; a aplicação roda inteiramente no navegador, e o histórico no Supabase é opcional.
+
+**Código-fonte:** <https://github.com/gustavomartins-dev-spec/keccaklab>, sob a [licença MIT](LICENSE). Você pode usar, modificar e redistribuir o código, inclusive para reproduzir os experimentos ou estender a ferramenta, mantendo o aviso de copyright.
+
 ## Desenvolvimento
 
 Use Node.js 22 ou superior. O arquivo `.nvmrc` padroniza o desenvolvimento em Node.js 24; com NVM instalado, execute `nvm install` e `nvm use` na raiz do projeto.
@@ -123,3 +127,7 @@ As telas compõem os componentes e recebem os controladores dos hooks. Os compon
 Os hooks são instanciados no `App` para preservar a etapa selecionada, os resultados, a comparação e o histórico ao trocar de tela. A abertura do modal pertence à tela Keccak. O componente `ui/Modal` cuida do foco, da tecla Escape e do bloqueio de rolagem; `modals/TransformationModal` fornece o conteúdo da transformação.
 
 Os estilos são importados por `index.css`. As regras de responsividade ficam em `styles/responsive.css`, após os estilos dos módulos para manter a ordem da cascata.
+
+## Licença
+
+Distribuído sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE).
