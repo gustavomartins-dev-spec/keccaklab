@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { keccakF200 } from './keccak200';
 import {
   getCellChanges,
   getChangedCellSet,
@@ -120,5 +121,34 @@ describe('operações auxiliares do Keccak', () => {
         [16, 255],
       ]),
     ).toBe('000f10ff');
+  });
+});
+
+describe('rodadas do visualizador Keccak', () => {
+  const flat = (round: number, step: number) => Uint8Array.from(getStateAtStep(step, round).flat());
+
+  it('a saída da rodada 17 é Keccak-f[200] completo sobre a matriz inicial', () => {
+    expect(flat(17, 5)).toEqual(keccakF200(flat(0, 0)));
+  });
+
+  it('a entrada de cada rodada é a saída da rodada anterior', () => {
+    for (let round = 1; round < 18; round++) {
+      expect(getStateAtStep(0, round)).toEqual(getStateAtStep(5, round - 1));
+    }
+  });
+
+  it('aplica em ι a constante da rodada selecionada', () => {
+    for (let round = 0; round < 18; round++) {
+      const before = getStateAtStep(4, round)[0][0];
+      expect(getStateAtStep(5, round)[0][0]).toBe(before ^ getRoundConstant(round));
+    }
+  });
+
+  it('rejeita rodadas fora de 0 a 17 e protege o traço contra mutação', () => {
+    expect(() => getStateAtStep(0, 18)).toThrow(RangeError);
+    expect(() => getStateAtStep(0, -1)).toThrow(RangeError);
+    const copy = getStateAtStep(3, 9);
+    copy[0][0] ^= 0xff;
+    expect(getStateAtStep(3, 9)[0][0]).not.toBe(copy[0][0]);
   });
 });

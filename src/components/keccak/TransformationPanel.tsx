@@ -4,6 +4,7 @@ import { formatByte } from '../../utils/format';
 import Icon from '../ui/Icon';
 
 interface TransformationPanelProps {
+  round: number;
   step: number;
   detail: StepDetail;
   isPlaying: boolean;
@@ -13,6 +14,7 @@ interface TransformationPanelProps {
 }
 
 export default function TransformationPanel({
+  round,
   step,
   detail,
   isPlaying,
@@ -25,7 +27,11 @@ export default function TransformationPanel({
       <div className="explain-top">
         <div className="explain-label">
           <span className="section-kicker">
-            {step === 0 ? 'ESTADO INICIAL' : `TRANSFORMAÇÃO ${String(step).padStart(2, '0')}`}
+            {step === 0
+              ? round === 0
+                ? 'ESTADO INICIAL'
+                : `ENTRADA · RODADA ${round}`
+              : `RODADA ${round} · TRANSFORMAÇÃO ${String(step).padStart(2, '0')}`}
           </span>
           <span className="step-count">{String(step + 1).padStart(2, '0')} / 06</span>
         </div>
@@ -44,8 +50,16 @@ export default function TransformationPanel({
         <div className="initial-insight">
           <Icon name="info" size={18} />
           <p>
-            Estado anterior à aplicação de <strong>Theta</strong>. Nenhuma transformação foi
-            aplicada.
+            {round === 0 ? (
+              <>
+                Estado anterior à aplicação de <strong>Theta</strong>. Nenhuma transformação foi
+                aplicada.
+              </>
+            ) : (
+              <>
+                Saída da rodada {round - 1}. A rodada {round} aplica <strong>Theta</strong> a seguir.
+              </>
+            )}
           </p>
         </div>
       ) : (
@@ -80,7 +94,7 @@ export default function TransformationPanel({
             ? 'Pausar reprodução'
             : step === LAST_KECCAK_STEP
               ? 'Reproduzir novamente'
-              : 'Reproduzir rodada'}
+              : `Reproduzir rodada ${round}`}
         </button>
         <span className="player-hint">Ordem: θ → ρ → π → χ → ι.</span>
       </div>

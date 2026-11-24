@@ -106,6 +106,39 @@ describe('fluxos do laboratório', () => {
     expect(trigger).toHaveFocus();
   });
 
+  it('navega pelas 18 rodadas e atravessa a fronteira entre rodadas pelas setas', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    const rounds = screen.getByRole('group', { name: 'Rodadas de Keccak-f[200]' });
+    expect(within(rounds).getAllByRole('button')).toHaveLength(18);
+    expect(screen.getByRole('button', { name: 'Rodada anterior' })).toBeDisabled();
+
+    await user.click(within(rounds).getByRole('button', { name: 'Rodada 17' }));
+    expect(within(rounds).getByRole('button', { name: 'Rodada 17' })).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByRole('button', { name: 'Próxima rodada' })).toBeDisabled();
+    expect(screen.getByRole('heading', { name: 'Entrada da rodada 17' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Etapa anterior' }));
+    expect(within(rounds).getByRole('button', { name: 'Rodada 16' })).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(
+      screen.getByRole('heading', { name: 'Quebra de simetria com constante de rodada' }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Próxima etapa' }));
+    for (let step = 1; step <= 5; step++) {
+      await user.click(screen.getByRole('button', { name: 'Próxima etapa' }));
+    }
+    expect(screen.getByRole('button', { name: 'Próxima etapa' })).toBeDisabled();
+    expect(screen.getByText(/resultado completo de Keccak-f\[200\]/)).toBeInTheDocument();
+  });
+
   it('reproduz, pausa e reinicia uma rodada pelos controles da tela', () => {
     vi.useFakeTimers();
     render(
@@ -114,7 +147,7 @@ describe('fluxos do laboratório', () => {
       </StrictMode>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Reproduzir rodada' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reproduzir rodada 0' }));
     act(() => vi.advanceTimersByTime(850));
     expect(
       screen.getByRole('heading', { name: 'Difusão por paridade de colunas' }),
@@ -125,11 +158,12 @@ describe('fluxos do laboratório', () => {
       screen.getByRole('heading', { name: 'Difusão por paridade de colunas' }),
     ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Reproduzir rodada' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reproduzir rodada 0' }));
     for (let step = 2; step <= 5; step++) {
       act(() => vi.advanceTimersByTime(850));
     }
-    expect(screen.getByRole('button', { name: 'Próxima etapa' })).toBeDisabled();
+    // A reprodução para no fim da rodada; a seta seguinte leva à rodada 1.
+    expect(screen.getByRole('button', { name: 'Próxima etapa' })).toBeEnabled();
     fireEvent.click(screen.getByRole('button', { name: 'Reproduzir novamente' }));
     expect(screen.getByRole('heading', { name: 'Estado inicial' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Pausar reprodução' })).toBeInTheDocument();

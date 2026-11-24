@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import RoundNavigator from '../components/keccak/RoundNavigator';
 import StatePanel from '../components/keccak/StatePanel';
 import StepNavigator from '../components/keccak/StepNavigator';
 import TransformationPanel from '../components/keccak/TransformationPanel';
@@ -13,6 +14,7 @@ interface KeccakPageProps {
 export default function KeccakPage({ visualizer }: KeccakPageProps) {
   const [showDetails, setShowDetails] = useState(false);
   const {
+    round,
     step,
     matrix,
     hexState,
@@ -21,6 +23,11 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
     changedCells,
     cellChanges,
     selectStep,
+    selectRound,
+    goNext,
+    goPrevious,
+    isFirst,
+    isLast,
     pause,
     togglePlayback,
   } = visualizer;
@@ -47,19 +54,26 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
         </div>
       </div>
       <div className="section-heading">
-        <h2>Etapas da rodada</h2>
+        <h2>Rodadas e etapas</h2>
       </div>
+      <RoundNavigator round={round} onSelectRound={selectRound} />
       <StepNavigator step={step} onSelectStep={selectStep} />
       <div className="keccak-layout">
         <StatePanel
+          round={round}
           step={step}
           matrix={matrix}
           hexState={hexState}
           changedCells={changedCells}
           isPlaying={isPlaying}
+          isFirst={isFirst}
+          isLast={isLast}
           onSelectStep={selectStep}
+          onNext={goNext}
+          onPrevious={goPrevious}
         />
         <TransformationPanel
+          round={round}
           step={step}
           detail={detail}
           isPlaying={isPlaying}
@@ -76,7 +90,7 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
           <strong>Representação do estado</strong>
           <p>
             A simulação utiliza uma matriz de 5 × 5 lanes de 8 bits. As etapas são aplicadas na
-            ordem θ → ρ → π → χ → ι, mostrando a primeira das 18 rodadas de Keccak-f[200]. O módulo de colisões utiliza este mesmo núcleo de transformações.
+            ordem θ → ρ → π → χ → ι em cada uma das 18 rodadas de Keccak-f[200] (0 a 17); a saída de uma rodada é a entrada da seguinte. O módulo de colisões utiliza este mesmo núcleo de transformações.
           </p>
         </div>
         <span className="footnote-tag">25 lanes × 8 bits</span>
@@ -85,7 +99,13 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
         <span>KECCAK LAB</span>Visualização de estados e detecção de ciclos.
       </footer>
       {showDetails && (
-        <TransformationModal detail={detail} step={step} matrix={matrix} onClose={closeDetails} />
+        <TransformationModal
+          detail={detail}
+          round={round}
+          step={step}
+          matrix={matrix}
+          onClose={closeDetails}
+        />
       )}
     </section>
   );

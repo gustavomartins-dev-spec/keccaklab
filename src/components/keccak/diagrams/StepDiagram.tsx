@@ -8,10 +8,11 @@ import ThetaDiagram from './ThetaDiagram';
 
 interface StepDiagramProps {
   step: number;
+  round?: number;
   matrix: Matrix;
 }
 
-export default function StepDiagram({ step, matrix }: StepDiagramProps) {
+export default function StepDiagram({ step, round = 0, matrix }: StepDiagramProps) {
   switch (step) {
     case 0:
       return <EntryDiagram />;
@@ -24,7 +25,7 @@ export default function StepDiagram({ step, matrix }: StepDiagramProps) {
     case 4:
       return <ChiDiagram matrix={matrix} />;
     case 5:
-      return <IotaDiagram matrix={matrix} />;
+      return <IotaDiagram matrix={matrix} round={round} />;
     default:
       return null;
   }

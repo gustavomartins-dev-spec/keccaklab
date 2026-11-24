@@ -93,3 +93,17 @@
 .cell-binary { max-width: 100%; overflow-wrap: anywhere; text-align: center; line-height: 1.5; }
 .matrix-footer, .player-controls, .panel-header, .page-footer { flex-wrap: wrap; }
 .player-step { flex-wrap: wrap; }
+
+/* Round navigation (18 rounds of Keccak-f[200]) */
+.round-navigator { background: white; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+.round-navigator-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.round-current { display: block; font-size: 17px; color: var(--text); margin-top: 3px; }
+.round-current span { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 4px; }
+.round-constant { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--accent); background: var(--accent-soft); border-radius: 8px; padding: 5px 9px; margin-left: auto; }
+.round-track { display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); gap: 4px; }
+.round-chip { height: 32px; min-width: 0; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 8px; background: white; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; cursor: pointer; padding: 0; }
+.round-chip:hover { background: #faf8fe; }
+.round-chip.done { background: #f0ebfb; border-color: #e7ddfa; color: var(--accent); }
+.round-chip.selected { background: var(--accent); border-color: #6541c1; color: white; font-weight: 600; }
+.round-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.final-output-note { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); color: var(--text); font-size: 13px; }

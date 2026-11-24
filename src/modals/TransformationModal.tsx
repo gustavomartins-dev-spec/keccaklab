@@ -6,6 +6,7 @@ import type { Matrix, StepDetail } from '../types/keccak';
 
 interface TransformationModalProps {
   detail: StepDetail;
+  round: number;
   step: number;
   matrix: Matrix;
   onClose: () => void;
@@ -13,6 +14,7 @@ interface TransformationModalProps {
 
 export default function TransformationModal({
   detail,
+  round,
   step,
   matrix,
   onClose,
@@ -25,7 +27,9 @@ export default function TransformationModal({
       onClose={onClose}
       header={
         <div className="modal-header-left">
-          <span className="panel-label">TRANSFORMAÇÃO {String(step).padStart(2, '0')}</span>
+          <span className="panel-label">
+            RODADA {round} · TRANSFORMAÇÃO {String(step).padStart(2, '0')}
+          </span>
           <div className="modal-title-row">
             <span className="transform-symbol modal-symbol">{detail.symbol}</span>
             <div>
@@ -37,7 +41,11 @@ export default function TransformationModal({
       }
     >
       <p className="modal-description">{detail.description}</p>
-      <StepDiagram step={step} matrix={step > 0 ? getStateAtStep(step - 1) : matrix} />
+      <StepDiagram
+        step={step}
+        round={round}
+        matrix={step > 0 ? getStateAtStep(step - 1, round) : matrix}
+      />
       <div className="modal-formula">
         <span className="panel-label">FÓRMULA</span>
         <code>{detail.formula}</code>

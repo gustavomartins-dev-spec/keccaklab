@@ -9,3 +9,6 @@ export const KECCAK_STEPS = [
 
 export const LAST_KECCAK_STEP = KECCAK_STEPS.length - 1;
 export const PLAYBACK_INTERVAL_MS = 850;
+
+export const KECCAK_ROUND_COUNT = 18;
+export const LAST_KECCAK_ROUND = KECCAK_ROUND_COUNT - 1;

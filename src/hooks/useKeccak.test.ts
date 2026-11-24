@@ -86,4 +86,50 @@ describe('useKeccak', () => {
     unmount();
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  it('seleciona rodadas mantendo a etapa e limita a faixa 0–17', () => {
+    const { result } = renderHook(useKeccak);
+    act(() => result.current.selectStep(5));
+    act(() => result.current.selectRound(3));
+    expect(result.current.round).toBe(3);
+    expect(result.current.step).toBe(5);
+    expect(result.current.detail.formula).toContain('RC[3]');
+    act(() => result.current.selectRound(99));
+    expect(result.current.round).toBe(17);
+    act(() => result.current.selectRound(-4));
+    expect(result.current.round).toBe(0);
+  });
+
+  it('avança de ι para a entrada da próxima rodada e volta pelo caminho inverso', () => {
+    const { result } = renderHook(useKeccak);
+    expect(result.current.isFirst).toBe(true);
+    act(() => result.current.goPrevious());
+    expect([result.current.round, result.current.step]).toEqual([0, 0]);
+
+    act(() => result.current.selectStep(LAST_KECCAK_STEP));
+    act(() => result.current.goNext());
+    expect([result.current.round, result.current.step]).toEqual([1, 0]);
+    expect(result.current.detail.title).toBe('Entrada da rodada 1');
+
+    act(() => result.current.goPrevious());
+    expect([result.current.round, result.current.step]).toEqual([0, LAST_KECCAK_STEP]);
+
+    act(() => result.current.selectRound(17));
+    act(() => result.current.selectStep(LAST_KECCAK_STEP));
+    expect(result.current.isLast).toBe(true);
+    act(() => result.current.goNext());
+    expect([result.current.round, result.current.step]).toEqual([17, LAST_KECCAK_STEP]);
+  });
+
+  it('reproduz apenas a rodada selecionada', () => {
+    const { result } = renderHook(useKeccak);
+    act(() => result.current.selectRound(7));
+    act(() => result.current.togglePlayback());
+    for (let tick = 0; tick < 10; tick++) act(() => vi.advanceTimersByTime(PLAYBACK_INTERVAL_MS));
+    expect(result.current.round).toBe(7);
+    expect(result.current.step).toBe(LAST_KECCAK_STEP);
+    expect(result.current.isPlaying).toBe(false);
+  });
+
 });
+

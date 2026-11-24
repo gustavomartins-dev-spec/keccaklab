@@ -17,6 +17,7 @@ describe('TransformationModal', () => {
     render(
       <TransformationModal
         detail={detail}
+        round={0}
         step={step}
         matrix={getStateAtStep(step)}
         onClose={vi.fn()}
@@ -29,5 +30,20 @@ describe('TransformationModal', () => {
       within(dialog).getByText(detail.formula.replace(/\s+/g, ' '), { selector: 'code' }),
     ).toBeInTheDocument();
     expect(within(dialog).getAllByRole('listitem')).toHaveLength(detail.steps.length);
+  });
+
+  it('usa a constante da rodada selecionada no diagrama de Iota', () => {
+    render(
+      <TransformationModal
+        detail={STEP_DETAILS[5]}
+        round={17}
+        step={5}
+        matrix={getStateAtStep(5, 17)}
+        onClose={vi.fn()}
+      />,
+    );
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Constante de rodada RC[17]')).toBeInTheDocument();
+    expect(within(dialog).getByText(/última constante/)).toBeInTheDocument();
   });
 });

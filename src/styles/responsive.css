@@ -63,6 +63,9 @@
   .desktop-break { display: none; }
   .section-heading h2 { font-size: 12px; }
   .stepper { padding: 8px 5px; gap: 0; border-radius: 12px; margin-bottom: 18px; }
+  .round-navigator { padding: 12px; }
+  .round-track { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+  .round-constant { margin-left: 0; }
   .step-button { padding: 9px 2px; }
   .step-node { width: 31px; height: 32px; font-size: 21px; border-radius: 10px; margin-bottom: 8px; }
   .step-button strong { font-size: 12px; }
