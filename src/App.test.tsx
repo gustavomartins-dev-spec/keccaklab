@@ -232,7 +232,7 @@ describe('fluxos do laboratório', () => {
     // A tela de comparação não mostra o diagrama da busca única.
     expect(screen.queryByRole('button', { name: 'Executar busca' })).not.toBeInTheDocument();
 
-    const chartName = 'Gráfico comparando comprimento de ρ por tamanho de saída';
+    const chartName = /passos até repetir um valor/;
     expect(screen.queryByRole('img', { name: chartName })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Executar comparação' }));
 

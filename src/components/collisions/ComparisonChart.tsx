@@ -1,34 +1,87 @@
-import { scaleLog } from 'd3';
-import { useSvgScale } from '../../hooks/useSvgScale';
+import type { CSSProperties } from 'react';
 import type { ComparisonEntry } from '../../types/experiments';
+import { formatCount } from '../../utils/format';
 
-export default function ComparisonChart({comparison}: {comparison:ComparisonEntry[]}) {
-  const max=Math.max(...comparison.flatMap(entry=>[entry.maxIterations,entry.expected]),2);
-  const height=scaleLog().base(2).domain([1,max]).range([0,165]);
-  const chartWidth = Math.max(800, comparison.length * 180 + 100);
-  const plotWidth = chartWidth - 100;
-  const [svgRef, svgScale] = useSvgScale(chartWidth, 280);
-  const ticks = Array.from({length: Math.floor(Math.log2(max) / 4) + 1}, (_, k) => 16 ** k);
+interface ComparisonChartProps {
+  comparison: ComparisonEntry[];
+}
+
+/** Short tick label: 1, 10, 100, 1 mil, 10 mil, 100 mil, 1 mi… */
+const tickLabel = (value: number): string =>
+  value >= 1e6 ? `${value / 1e6} mi` : value >= 1e3 ? `${value / 1e3} mil` : String(value);
+
+/**
+ * Horizontal bars, one per output size: average number of steps until a value repeats,
+ * on a base-10 log scale, with a marker for the value expected from theory.
+ * Drawn in HTML so text keeps its real size at any width.
+ */
+export default function ComparisonChart({ comparison }: ComparisonChartProps) {
+  const max = Math.max(...comparison.flatMap((entry) => [entry.iterations, entry.expected]), 10);
+  const decades = Math.ceil(Math.log10(max * 1.15));
+  const ticks = Array.from({ length: decades + 1 }, (_, k) => 10 ** k);
+  const position = (value: number): string =>
+    `${(Math.log10(Math.max(1, value)) / decades) * 100}%`;
+  const summary = comparison
+    .map(
+      (entry) =>
+        `${entry.bits} bits: ${formatCount(entry.iterations)} passos em média, esperado ${formatCount(entry.expected)}`,
+    )
+    .join('; ');
+
   return (
-    <>
-      <div className="comparison-chart">
-        <svg ref={svgRef} style={svgScale} viewBox={`0 0 ${chartWidth} 280`} role="img" aria-label="Gráfico comparando comprimento de ρ por tamanho de saída">
-          <text className="bar-label" x="60" y="24">comprimento de ρ (μ + λ) · escala log₂</text>
-          {ticks.map(value=><g key={value}><path className="chart-grid" d={'M60 '+(225-height(value))+'H'+(chartWidth-40)}/><text className="bar-label" x="52" y={229-height(value)} textAnchor="end">{value}</text></g>)}
-          {comparison.map((entry,i)=>{
-            const x=60+(plotWidth/comparison.length)*(i+0.5);
-            const actualX=x+28;
-            return <g key={entry.bits}>
-              <rect className="bar-expected" x={x-52} y={225-height(entry.expected)} width="48" height={height(entry.expected)} rx="2"/>
-              <rect className="bar-actual" x={x+4} y={225-height(entry.iterations)} width="48" height={height(entry.iterations)} rx="2"/>
-              <path className="bar-range" d={'M'+actualX+' '+(225-height(entry.minIterations))+'V'+(225-height(entry.maxIterations))+'M'+(actualX-7)+' '+(225-height(entry.maxIterations))+'H'+(actualX+7)}/>
-              <text className="bar-label" x={x} y="251" textAnchor="middle">{entry.bits} bits</text>
-              <text className="bar-value" x={actualX} y={Math.max(22,215-height(entry.maxIterations))} textAnchor="middle">{Math.round(entry.iterations)}</text>
-            </g>;
-          })}
-        </svg>
+    <div className="steps-chart">
+      <div
+        className="steps-chart-plot"
+        role="img"
+        aria-label={`Gráfico: passos até repetir um valor, por tamanho de saída. ${summary}.`}
+      >
+        <div className="steps-axis" aria-hidden="true">
+          {ticks.map((tick) => (
+            <span key={tick} style={{ left: position(tick) }}>
+              {tickLabel(tick)}
+            </span>
+          ))}
+        </div>
+        {comparison.map((entry) => {
+          /* Long bars hold their value inside, short ones beside them. */
+          const inside = Math.log10(Math.max(1, entry.iterations)) / decades > 0.3;
+          return (
+            <div className="steps-row" key={entry.bits}>
+              <div className="steps-label">
+                <strong>{entry.bits} bits</strong>
+                <span>{formatCount(2 ** entry.bits)} valores</span>
+              </div>
+              <div className="steps-track" aria-hidden="true">
+                {ticks.map((tick) => (
+                  <i key={tick} className="steps-grid" style={{ left: position(tick) }} />
+                ))}
+                <div
+                  className={`steps-bar ${inside ? 'inside' : ''}`}
+                  style={{ width: position(entry.iterations) }}
+                >
+                  <span>{formatCount(entry.iterations)} passos</span>
+                </div>
+                <div
+                  className="steps-expected"
+                  style={{ left: position(entry.expected) } as CSSProperties}
+                  title={`Esperado pela teoria: ≈ ${formatCount(entry.expected)} passos`}
+                />
+              </div>
+            </div>
+          );
+        })}
+        <div className="steps-axis-title" aria-hidden="true">
+          passos até um valor se repetir (escala logarítmica: cada linha vale 10× a anterior)
+        </div>
       </div>
-      <div className="comparison-legend"><span><i className="legend-dot actual"/>média de μ + λ</span><span><i className="legend-dot expected"/>esperado ≈ √(πN/2)</span><span>traço escuro: mínimo a máximo</span></div>
-    </>
+      <div className="comparison-legend">
+        <span>
+          <i className="legend-dot actual" /> média medida
+        </span>
+        <span>
+          <i className="legend-expected" /> esperado pela teoria
+        </span>
+      </div>
+    </div>
   );
 }

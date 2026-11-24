@@ -81,36 +81,49 @@
 .comparison-header h3 { font-size: 17px; font-weight: 650; letter-spacing: -.3px; margin: 6px 0 0; }
 .comparison-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 220px; padding: 24px; border: 1px dashed #e1d9ed; background: #fcfaff; border-radius: 10px; color: var(--accent); text-align: center; }
 .comparison-empty p { max-width: 420px; margin: 0; font-size: 14px; line-height: 1.7; color: var(--muted); }
-.comparison-chart { position: relative; overflow-x: auto; background: #fcfaff; border: 1px solid var(--line-soft); border-radius: 10px; }
-.comparison-chart svg { display: block; width: 100%; height: auto; }
 .chart-grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 5; }
-.bar-actual { fill: var(--accent); }
-.bar-expected { fill: none; stroke: var(--accent-2); stroke-width: 1.5; stroke-dasharray: 4 4; }
-.bar-range { fill: none; stroke: var(--text); stroke-width: 2; }
-.bar-label { font: 13px var(--mono); fill: var(--muted); }
-.bar-value { font: 14px var(--mono); fill: var(--accent); }
 .comparison-legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--muted); }
-.legend-dot.expected { background: transparent; border: 1px dashed var(--accent-2); }
-.comparison-side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.comparison-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .comparison-side-empty { margin: 0; padding: 16px; border: 1px dashed var(--line); border-radius: 12px; font-size: 13px; color: var(--muted); text-align: center; }
-.comparison-row { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: white; }
-.cmp-bits { font: 600 13px var(--mono); color: var(--accent); }
+.comparison-row { display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; background: white; }
+.cmp-bits { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font: 600 14px var(--mono); color: var(--accent); }
+.cmp-bits small { font: 13px 'DM Sans', sans-serif; color: var(--muted); }
 .cmp-iter { font-size: 13px; color: var(--text-soft); }
 .cmp-iter strong { font: 22px var(--mono); color: var(--text); margin-right: 4px; }
 .cmp-stats { display: grid; gap: 2px; margin: 2px 0 0; }
 .cmp-stats div { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
 .cmp-stats dt { color: var(--muted); }
 .cmp-stats dd { margin: 0; font-family: var(--mono); color: var(--text-soft); }
-.comparison-note { margin-top: auto; border-radius: 12px; background: #f7f5fc; padding: 12px 14px; }
+.comparison-note { margin-top: auto; border-radius: 12px; background: #f7f5fc; padding: 10px 14px; }
 .comparison-note p { font-size: 13px; color: var(--text-soft); line-height: 1.6; margin: 6px 0 0; }
 
 /* SVG text is drawn in viewBox units; --s (useSvgScale) keeps it at 12px or more on screen. */
-.rho-graph, .comparison-chart svg { --s: 1; }
+.rho-graph { --s: 1; }
 .rho-node text { font-size: max(15px, calc(13.5px / var(--s))); }
 .rho-region-label { font-size: max(16px, calc(13.5px / var(--s))); }
-.bar-label { font-size: max(13px, calc(13.5px / var(--s))); }
-.bar-value { font-size: max(14px, calc(14px / var(--s))); }
 .floyd-pointer { transform-box: fill-box; transform-origin: center; transform: scale(max(1, calc(1.05 / var(--s)))); }
+
+/* Steps chart: horizontal bars on a log scale, in HTML so text keeps its size */
+.comparison-intro { margin: 0; font-size: 14px; line-height: 1.6; color: var(--text-soft); max-width: 760px; }
+.comparison-insight { margin: 0; padding: 10px 14px; border-left: 3px solid var(--accent); border-radius: 6px; background: var(--accent-soft); font-size: 14px; line-height: 1.6; color: var(--text); }
+.steps-chart { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.steps-chart-plot { --label: 120px; position: relative; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 34px 28px 14px 16px; background: #fcfaff; border: 1px solid var(--line-soft); border-radius: 10px; }
+.steps-axis { position: absolute; top: 10px; left: calc(16px + var(--label) + 12px); right: 28px; height: 18px; }
+.steps-axis span { position: absolute; transform: translateX(-50%); font: 13px var(--mono); color: var(--muted); white-space: nowrap; }
+.steps-axis span:first-child { transform: none; }
+.steps-axis span:last-child { transform: translateX(-100%); }
+.steps-row { display: grid; grid-template-columns: var(--label) minmax(0, 1fr); align-items: center; gap: 12px; }
+.steps-label { display: flex; flex-direction: column; gap: 2px; }
+.steps-label strong { font-size: 15px; color: var(--text); }
+.steps-label span { font-size: 13px; color: var(--muted); }
+.steps-track { position: relative; height: 40px; }
+.steps-grid { position: absolute; top: -6px; bottom: -6px; border-left: 1px dashed var(--line); }
+.steps-bar { position: relative; height: 100%; min-width: 4px; border-radius: 0 6px 6px 0; background: var(--accent); transition: width .4s; }
+.steps-bar span { position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%); font: 600 14px var(--mono); color: var(--accent); white-space: nowrap; }
+.steps-expected { position: absolute; top: -5px; bottom: -5px; width: 0; border-left: 3px dashed var(--accent-2); }
+.steps-axis-title { margin-top: 2px; padding-left: calc(var(--label) + 12px); font-size: 13px; color: var(--muted); }
+.steps-bar.inside span { left: 12px; color: white; }
+.legend-expected { display: inline-block; width: 0; height: 14px; border-left: 3px dashed var(--accent-2); }
 
 /* Method modal: one topic at a time */
 .method-carousel { display: flex; flex-direction: column; gap: 18px; }
@@ -139,8 +152,9 @@
   .rho-visual, .comparison-section { min-height: 0; }
   .rho-graph-scroll { flex: 1; min-height: 0; }
   .rho-graph { height: 100%; }
-  .comparison-chart { flex: 1; min-height: 0; }
-  .comparison-chart svg { height: 100%; }
+  .steps-chart, .steps-chart-plot { flex: 1; min-height: 0; }
+  .steps-chart-plot { justify-content: space-evenly; }
+  .steps-track { height: clamp(32px, 7vh, 56px); }
 }
 @media (min-width: 1100px) and (max-width: 1440px) {
   .rho-workspace { grid-template-columns: 230px minmax(0, 1fr) 260px; gap: 12px; }
@@ -166,7 +180,8 @@
   .view-switch button { flex: 1; justify-content: center; }
   .bits-options { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .rho-graph { min-width: 760px; }
-  .comparison-chart svg { min-width: 600px; }
   .comparison-side { grid-template-columns: minmax(0, 1fr); }
   .rho-visual .chart-legend { margin-left: 0; }
+  .steps-chart-plot { --label: 78px; padding-right: 14px; }
+  .steps-axis { right: 14px; }
 }

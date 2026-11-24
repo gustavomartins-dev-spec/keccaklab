@@ -1,6 +1,7 @@
 import { COMPARISON_TRIALS } from '../../constants/experiments';
 import type { ComparisonEntry, SearchProgress } from '../../types/experiments';
 import Icon from '../ui/Icon';
+import { formatCount } from '../../utils/format';
 import ComparisonChart from './ComparisonChart';
 import SearchProgressBox from './SearchProgressBox';
 
@@ -13,17 +14,25 @@ interface ComparisonSectionProps {
   progress: SearchProgress | null;
 }
 
-const fmt = (value: number, digits = 0): string =>
-  value.toLocaleString('pt-BR', { maximumFractionDigits: digits });
+/** One sentence with the takeaway, computed from the smallest and largest sizes. */
+function takeaway(comparison: ComparisonEntry[]): string | null {
+  if (comparison.length < 2) return null;
+  const first = comparison[0];
+  const last = comparison[comparison.length - 1];
+  const valuesGrowth = 2 ** (last.bits - first.bits);
+  const stepsGrowth = last.iterations / first.iterations;
+  return `De ${first.bits} para ${last.bits} bits, os valores possíveis ficaram ${formatCount(valuesGrowth)}× mais numerosos, mas os passos até repetir só ${formatCount(stepsGrowth)}× (a teoria prevê ${formatCount(Math.sqrt(valuesGrowth))}×, a raiz quadrada).`;
+}
 
 export default function ComparisonSection({ comparison, onCompare, onCancel, busy, job, progress }: ComparisonSectionProps) {
+  const insight = takeaway(comparison);
   return (
     <div className="compare-workspace">
       <div className="comparison-section">
         <div className="comparison-header">
           <div>
-            <span className="panel-label">TAMANHO DA SAÍDA E TRABALHO</span>
-            <h3>Comprimento de ρ até a primeira repetição</h3>
+            <span className="panel-label">TAMANHO DA SAÍDA × TRABALHO</span>
+            <h3>Quantos passos até um valor se repetir?</h3>
           </div>
           {job === 'compare' ? (
             <button className="secondary-button" onClick={onCancel}>
@@ -36,18 +45,21 @@ export default function ComparisonSection({ comparison, onCompare, onCancel, bus
             </button>
           )}
         </div>
+        <p className="comparison-intro">
+          Para cada tamanho de saída, a busca parte de {COMPARISON_TRIALS} sementes sorteadas e aplica h
+          repetidamente até um valor aparecer pela segunda vez. A barra mostra a média de passos.
+        </p>
         {job && <SearchProgressBox job={job} progress={progress} />}
         {comparison.length === 0 ? (
           <div className="comparison-empty">
             <Icon name="chart" size={28} />
-            <p>
-              Compare saídas de 8, 16 e 24 bits com {COMPARISON_TRIALS} sementes sorteadas por tamanho.
-              O gráfico mostra a média e a variação entre as buscas. Cada execução sorteia novas
-              sementes, então os números mudam um pouco de uma vez para outra.
-            </p>
+            <p>Execute a comparação para ver os resultados de 8, 16 e 24 bits.</p>
           </div>
         ) : (
-          <ComparisonChart comparison={comparison} />
+          <>
+            {insight && <p className="comparison-insight">{insight}</p>}
+            <ComparisonChart comparison={comparison} />
+          </>
         )}
       </div>
       <aside className="comparison-side" aria-label="Resultados por tamanho de saída">
@@ -57,25 +69,35 @@ export default function ComparisonSection({ comparison, onCompare, onCancel, bus
           comparison.map((entry) => (
             <div className="comparison-row" key={entry.bits}>
               <span className="cmp-bits">
-                {entry.bits} bits · {entry.trials} sementes
+                {entry.bits} bits <small>{formatCount(2 ** entry.bits)} valores</small>
               </span>
               <span className="cmp-iter">
-                <strong>{fmt(entry.iterations, 1)}</strong> estados em média (μ + λ)
+                <strong>{formatCount(entry.iterations)}</strong> passos em média até repetir
               </span>
               <dl className="cmp-stats">
-                <div><dt>mín · máx</dt><dd>{entry.minIterations} · {entry.maxIterations}</dd></div>
-                <div><dt>esperado</dt><dd>≈ {fmt(entry.expected)}</dd></div>
-                <div><dt>avaliações de h</dt><dd>{fmt(Math.round(entry.evaluations))}</dd></div>
+                <div>
+                  <dt>esperado pela teoria</dt>
+                  <dd>≈ {formatCount(entry.expected)}</dd>
+                </div>
+                <div>
+                  <dt>menor e maior busca</dt>
+                  <dd>
+                    {formatCount(entry.minIterations)} a {formatCount(entry.maxIterations)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>cálculos de h por busca</dt>
+                  <dd>{formatCount(entry.evaluations)}</dd>
+                </div>
               </dl>
             </div>
           ))
         )}
         <div className="comparison-note">
-          <span className="panel-label">COMO INTERPRETAR</span>
+          <span className="panel-label">POR QUE ISSO IMPORTA</span>
           <p>
-            O tracejado é a média teórica √(πN/2) para N = 2ⁿ: cada 2 bits a mais dobram a referência.
-            A escala é log₂, então a altura das barras não é proporcional ao valor. Compare novamente
-            para ver quanto a média oscila com outras sementes.
+            Um valor se repete bem antes de esgotar as possibilidades, por volta de √N passos (paradoxo
+            do aniversário). Por isso n bits de saída valem só ~n/2 bits contra colisões.
           </p>
         </div>
       </aside>
