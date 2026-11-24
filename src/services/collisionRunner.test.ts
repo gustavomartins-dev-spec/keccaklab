@@ -35,6 +35,15 @@ describe('execução em worker',()=>{
     await rejected;
     expect(FakeWorker.instances[0].terminate).toHaveBeenCalledOnce();
   });
+  it('sorteia uma semente nova para cada comparação',()=>{
+    startCollisionComparison(vi.fn());
+    startCollisionComparison(vi.fn());
+    const [first,second]=FakeWorker.instances.map(worker=>worker.postMessage.mock.calls[0][0]);
+    expect(first).toMatchObject({type:'compare'});
+    expect(first.seed).not.toBe(second.seed);
+    startCollisionComparison(vi.fn(),123);
+    expect(FakeWorker.instances[2].postMessage).toHaveBeenCalledWith({type:'compare',bits:8,seed:123});
+  });
   it('propaga erros sem produzir resultado',async()=>{
     const task=startCollisionComparison(vi.fn());
     FakeWorker.instances[0].emit({type:'error',message:'Limite atingido'});

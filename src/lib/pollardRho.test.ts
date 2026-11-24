@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { comparePollardRho, hashToBits, runPollardRho, searchPollardRho } from './pollardRho';
+import { comparePollardRho, createRandom, drawSeeds, hashToBits, runPollardRho, searchPollardRho } from './pollardRho';
 
 describe.each([4,6,8,12,16])('Floyd com Keccak-200 truncado em %i bits',bits=>{
   it('recupera e verifica duas entradas distintas com o mesmo resumo',()=>{
@@ -81,5 +81,27 @@ describe('casos de borda de Floyd',()=>{
       expect(entry.evaluations).toBeGreaterThan(entry.iterations);
       expect(entry.expected).toBeCloseTo(Math.sqrt(Math.PI/2)*2**(entry.bits/2));
     }
+  });
+  it('sorteia sementes distintas e reproduzíveis a partir da semente da execução',()=>{
+    const seeds=drawSeeds(createRandom(42),30,256);
+    expect(new Set(seeds).size).toBe(30);
+    expect(seeds.every(seed=>Number.isInteger(seed)&&seed>=0&&seed<256)).toBe(true);
+    expect(drawSeeds(createRandom(42),30,256)).toEqual(seeds);
+    expect(drawSeeds(createRandom(43),30,256)).not.toEqual(seeds);
+    // Mais amostras que valores possíveis: usa todos e só então repete.
+    const all=drawSeeds(createRandom(1),20,16);
+    expect(new Set(all).size).toBe(16);
+    expect(all).toHaveLength(20);
+  });
+  it('muda o resultado da comparação quando muda a semente da execução',()=>{
+    const run=(runSeed:number)=>{
+      const job=comparePollardRho([8],10,runSeed);
+      let next=job.next();
+      while(!next.done)next=job.next();
+      return next.value[0];
+    };
+    expect(run(7)).toEqual(run(7));
+    expect(run(7).iterations).not.toBe(run(8).iterations);
+    expect(()=>comparePollardRho([8],101).next()).toThrow(RangeError);
   });
 });

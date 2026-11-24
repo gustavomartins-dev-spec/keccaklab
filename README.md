@@ -21,11 +21,11 @@ As execuções são registradas no banco usando as variáveis `VITE_SUPABASE_URL
 
 ## Módulo de colisões e Keccak-200
 
-O visualizador aplica as cinco etapas oficiais em cada uma das 18 rodadas de Keccak-f[200] (0 a 17), com seletor de rodadas; a saída de uma rodada é a entrada da seguinte. As etapas podem ser vistas em modo sequencial (cada uma recebe o resultado da anterior) ou isolado (a etapa escolhida aplicada sozinha à entrada da rodada). Cada transformação é animada bit a bit: θ, χ e ι destacam os bits invertidos, ρ desliza os bits dentro da lane e π move as lanes para as novas posições. O painel de efeito avalanche inverte um bit da entrada e mostra, rodada a rodada, quantos dos 200 bits diferem entre as duas execuções. A busca usa esse mesmo núcleo dentro de uma esponja didática Keccak[r=120,c=80], com 18 rodadas, preenchimento pad10*1 e sufixo 0x01. Esta instância de 200 bits não é SHA3-256 nem outra função SHA-3 padronizada.
+O visualizador aplica as cinco etapas oficiais em cada uma das 18 rodadas de Keccak-f[200] (0 a 17), com seletor de rodadas; a saída de uma rodada é a entrada da seguinte. As etapas podem ser vistas em modo sequencial (cada uma recebe o resultado da anterior) ou isolado (a etapa escolhida aplicada sozinha à entrada da rodada). Cada transformação é animada bit a bit: θ, χ e ι destacam os bits invertidos, ρ desliza os bits dentro da lane e π move as lanes para as novas posições. O efeito avalanche inverte o bit 0 de A[0,0] na entrada e mostra, rodada a rodada, quantos dos 200 bits diferem entre as duas execuções: na barra lateral, junto ao seletor de rodadas, e bit a bit no painel ao lado da matriz. A busca usa esse mesmo núcleo dentro de uma esponja didática Keccak[r=120,c=80], com 18 rodadas, preenchimento pad10*1 e sufixo 0x01. Esta instância de 200 bits não é SHA3-256 nem outra função SHA-3 padronizada.
 
 O segundo módulo oferece saídas de 4, 6, 8, 12, 16, 20, 24, 28, 32, 36 e 40 bits, semente configurável, progresso e cancelamento. Floyd encontra o ciclo em memória constante, recupera duas entradas distintas e verifica seus resumos antes de apresentar a colisão. Buscas grandes e a comparação de múltiplas sementes rodam em Web Worker. Cada busca tem limite de 20 milhões de avaliações e até 64 sementes; atingir o limite produz uma mensagem, sem fabricar um resultado.
 
-A representação D3 mostra cauda e ciclo e reproduz os ponteiros de Floyd. Ela usa no máximo 24 nós e 49 quadros, em uma etapa separada da busca. Trechos omitidos e saltos da reprodução são identificados. A comparação usa cinco sementes para cada saída de 8, 16 e 24 bits e distingue passos da trajetória de avaliações efetivas de h.
+A representação D3 mostra cauda e ciclo e reproduz os ponteiros de Floyd. Ela usa no máximo 24 nós e 49 quadros, em uma etapa separada da busca. Trechos omitidos e saltos da reprodução são identificados. A comparação de tamanhos fica numa tela própria do módulo e sorteia 30 sementes novas para cada saída de 8, 16 e 24 bits a cada execução; distingue passos da trajetória de avaliações efetivas de h. Como todas as sementes usam a mesma função h, o ciclo se repete entre elas e a média pode se afastar da referência √(πN/2). A explicação do método fica no modal "Como funciona", dividida em tópicos.
 
 A metodologia, a codificação da entrada e o pseudocódigo estão em [docs/metodologia-keccak-rho.md](docs/metodologia-keccak-rho.md).
 
@@ -124,7 +124,7 @@ src/
 
 As telas compõem os componentes e recebem os controladores dos hooks. Os componentes recebem dados e callbacks por props. O acesso ao banco fica em `services/experimentRuns.ts`; as funções de cálculo ficam em `lib/keccak.ts` e `lib/pollardRho.ts`.
 
-Os hooks são instanciados no `App` para preservar a etapa selecionada, os resultados, a comparação e o histórico ao trocar de tela. A abertura do modal pertence à tela Keccak. O componente `ui/Modal` cuida do foco, da tecla Escape e do bloqueio de rolagem; `modals/TransformationModal` fornece o conteúdo da transformação.
+Os hooks são instanciados no `App` para preservar a etapa selecionada, os resultados, a comparação e o histórico ao trocar de tela. Cada tela abre seus próprios modais (detalhes da transformação no Keccak; "Como funciona" nas colisões). O componente `ui/Modal` cuida do foco, da tecla Escape e do bloqueio de rolagem; `modals/TransformationModal` fornece o conteúdo da transformação.
 
 Os estilos são importados por `index.css`. As regras de responsividade ficam em `styles/responsive.css`, após os estilos dos módulos para manter a ordem da cascata.
 
