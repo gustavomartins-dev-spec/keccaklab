@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { keccakF200 } from './keccak200';
+import { keccakF200, rho } from './keccak200';
 import {
   getCellChanges,
   getChangedCellSet,
@@ -11,6 +11,11 @@ import {
   getAvalancheProfile,
   flipInputBit,
   popcount8,
+  applyStep,
+  countBits,
+  getAvalancheDiff,
+  getPiOrigin,
+  getStepView,
   matrixToHex,
 } from './keccak';
 
@@ -194,5 +199,45 @@ describe('efeito avalanche', () => {
   it('rejeita posições de bit inválidas', () => {
     expect(() => flipInputBit({ x: 5, y: 0, bit: 0 })).toThrow(RangeError);
     expect(() => flipInputBit({ x: 0, y: 0, bit: 8 })).toThrow(RangeError);
+  });
+});
+
+describe('modo isolado (RF04)', () => {
+  it('aplica uma única transformação à entrada da rodada', () => {
+    const input = getStateAtStep(0, 4);
+    const state = Uint8Array.from(input.flat());
+    rho(state);
+    expect(applyStep(input, 2, 4).flat()).toEqual(Array.from(state));
+    expect(applyStep(input, 0, 4)).toEqual(input);
+    expect(() => applyStep(input, 6, 4)).toThrow(RangeError);
+  });
+
+  it('no modo isolado, toda etapa parte da entrada da rodada', () => {
+    for (let step = 1; step <= 5; step++) {
+      const view = getStepView(step, 2, 'isolated');
+      expect(view.before).toEqual(getStateAtStep(0, 2));
+      expect(view.after).toEqual(applyStep(getStateAtStep(0, 2), step, 2));
+    }
+  });
+
+  it('no modo sequencial, a etapa parte do resultado da anterior', () => {
+    const view = getStepView(4, 6, 'sequential');
+    expect(view.before).toEqual(getStateAtStep(3, 6));
+    expect(view.after).toEqual(getStateAtStep(4, 6));
+  });
+
+  it('θ isolado coincide com θ sequencial, pois ambos partem da entrada', () => {
+    expect(getStepView(1, 0, 'isolated')).toEqual(getStepView(1, 0, 'sequential'));
+  });
+
+  it('ρ e π isolados preservam a diferença de 1 bit na avalanche', () => {
+    const profile = getAvalancheProfile({ x: 3, y: 2, bit: 4 });
+    expect(countBits(getAvalancheDiff(profile, 0, 2, 'isolated'))).toBe(1);
+    expect(countBits(getAvalancheDiff(profile, 0, 3, 'isolated'))).toBe(1);
+    expect(countBits(getAvalancheDiff(profile, 0, 4, 'isolated'))).toBeGreaterThanOrEqual(1);
+  });
+
+  it('getPiOrigin é o inverso do mapeamento de π', () => {
+    for (const { from, to } of getPiMap()) expect(getPiOrigin(to[0], to[1])).toEqual(from);
   });
 });

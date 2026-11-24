@@ -17,6 +17,9 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
   const {
     round,
     step,
+    mode,
+    setMode,
+    previousMatrix,
     matrix,
     hexState,
     detail,
@@ -58,12 +61,37 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
         <h2>Rodadas e etapas</h2>
       </div>
       <RoundNavigator round={round} onSelectRound={selectRound} />
-      <StepNavigator step={step} onSelectStep={selectStep} />
+      <div className="mode-toggle" role="radiogroup" aria-label="Modo de aplicação das transformações">
+        <button
+          role="radio"
+          aria-checked={mode === 'sequential'}
+          className={mode === 'sequential' ? 'selected' : ''}
+          onClick={() => setMode('sequential')}
+        >
+          Sequencial
+        </button>
+        <button
+          role="radio"
+          aria-checked={mode === 'isolated'}
+          className={mode === 'isolated' ? 'selected' : ''}
+          onClick={() => setMode('isolated')}
+        >
+          Isolado
+        </button>
+        <p>
+          {mode === 'sequential'
+            ? 'Cada etapa recebe o resultado da anterior: θ → ρ → π → χ → ι.'
+            : `A etapa escolhida é aplicada sozinha à entrada da rodada ${round}, sem as demais.`}
+        </p>
+      </div>
+      <StepNavigator step={step} isolated={mode === 'isolated'} onSelectStep={selectStep} />
       <div className="keccak-layout">
         <StatePanel
           round={round}
           step={step}
           matrix={matrix}
+          previousMatrix={previousMatrix}
+          mode={mode}
           hexState={hexState}
           changedCells={changedCells}
           isPlaying={isPlaying}
@@ -74,6 +102,7 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
           onPrevious={goPrevious}
         />
         <TransformationPanel
+          mode={mode}
           round={round}
           step={step}
           detail={detail}
@@ -83,7 +112,7 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
           onTogglePlayback={togglePlayback}
         />
       </div>
-      <AvalanchePanel round={round} step={step} onSelectRound={selectRound} />
+      <AvalanchePanel round={round} step={step} mode={mode} onSelectRound={selectRound} />
       <div className="module-footnote">
         <span className="footnote-icon">
           <Icon name="book" size={21} />
@@ -106,6 +135,7 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
           round={round}
           step={step}
           matrix={matrix}
+          previousMatrix={previousMatrix}
           onClose={closeDetails}
         />
       )}

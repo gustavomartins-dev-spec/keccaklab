@@ -1,5 +1,4 @@
 import { useId } from 'react';
-import { getStateAtStep } from '../lib/keccak';
 import StepDiagram from '../components/keccak/diagrams/StepDiagram';
 import Modal from '../components/ui/Modal';
 import type { Matrix, StepDetail } from '../types/keccak';
@@ -9,6 +8,8 @@ interface TransformationModalProps {
   round: number;
   step: number;
   matrix: Matrix;
+  /** State the step is applied to (depends on the sequential/isolated mode). */
+  previousMatrix?: Matrix;
   onClose: () => void;
 }
 
@@ -17,6 +18,7 @@ export default function TransformationModal({
   round,
   step,
   matrix,
+  previousMatrix,
   onClose,
 }: TransformationModalProps) {
   const titleId = useId();
@@ -44,7 +46,7 @@ export default function TransformationModal({
       <StepDiagram
         step={step}
         round={round}
-        matrix={step > 0 ? getStateAtStep(step - 1, round) : matrix}
+        matrix={step > 0 ? (previousMatrix ?? matrix) : matrix}
       />
       <div className="modal-formula">
         <span className="panel-label">FÓRMULA</span>

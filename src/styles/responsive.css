@@ -80,7 +80,9 @@
   .panel-icon { width: 31px; height: 31px; border-radius: 8px; }
   .round-tag { font-size: 12px; padding: 6px; }
   .matrix-frame { grid-template-columns: 24px minmax(0, 1fr); gap: 3px 5px; }
-  .state-grid { gap: 5px; }
+  .state-grid { gap: 5px; --gap: 5px; }
+  .animation-caption { margin-left: 0; flex-wrap: wrap; }
+  .mode-toggle p { margin: 6px 0 0; flex-basis: 100%; }
   .state-cell { min-height: 59px; border-radius: 7px; padding: 10px 1px; gap: 7px; }
   .state-cell strong { font-size: 18px; }
   .cell-binary { font-size: 12px; }

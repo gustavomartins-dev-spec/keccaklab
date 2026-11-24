@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { KECCAK_STEPS, LAST_KECCAK_ROUND, LAST_KECCAK_STEP } from '../../constants/keccak';
+import type { StepMode } from '../../lib/keccak';
 import type { Matrix } from '../../types/keccak';
 import Icon from '../ui/Icon';
 import MatrixView from './MatrixView';
@@ -7,6 +9,8 @@ interface StatePanelProps {
   round: number;
   step: number;
   matrix: Matrix;
+  previousMatrix: Matrix;
+  mode: StepMode;
   hexState: string;
   changedCells: Set<string>;
   isPlaying: boolean;
@@ -17,10 +21,21 @@ interface StatePanelProps {
   onPrevious: () => void;
 }
 
+const ANIMATION_CAPTIONS = [
+  'Estado de entrada. Avance para ver cada transformação animada bit a bit.',
+  'θ: os bits que piscam foram invertidos pelo XOR com a paridade das colunas vizinhas.',
+  'ρ: os bits deslizam dentro de cada lane, rotacionados pelo deslocamento da posição (x, y).',
+  'π: as lanes viajam da posição (x, y) para (y, 2x + 3y mod 5); os bits não mudam.',
+  'χ: os bits que piscam foram invertidos por (¬b ∧ c), combinando lanes da mesma linha.',
+  'ι: os bits que piscam na lane [0,0] são os bits 1 da constante de rodada.',
+];
+
 export default function StatePanel({
   round,
   step,
   matrix,
+  previousMatrix,
+  mode,
   hexState,
   changedCells,
   isPlaying,
@@ -30,6 +45,7 @@ export default function StatePanel({
   onNext,
   onPrevious,
 }: StatePanelProps) {
+  const [replay, setReplay] = useState(0);
   return (
     <div className="state-panel">
       <div className="panel-header">
@@ -48,7 +64,21 @@ export default function StatePanel({
           200 bits
         </span>
       </div>
-      <MatrixView matrix={matrix} activeStep={step} changedCells={changedCells} />
+      <MatrixView
+        matrix={matrix}
+        previous={previousMatrix}
+        activeStep={step}
+        changedCells={changedCells}
+        animationKey={`${round}-${step}-${mode}-${replay}`}
+      />
+      <div className="animation-caption">
+        <p>{ANIMATION_CAPTIONS[step]}</p>
+        {step > 0 && (
+          <button className="text-button" onClick={() => setReplay((n) => n + 1)}>
+            <Icon name="reset" size={14} /> Animar novamente
+          </button>
+        )}
+      </div>
       <div className="matrix-footer">
         <div className="legend">
           <span>
@@ -56,6 +86,9 @@ export default function StatePanel({
           </span>
           <span>
             <i className="legend-dot changed" /> Célula alterada
+          </span>
+          <span>
+            <i className="legend-dot flip" /> Bit invertido
           </span>
         </div>
         <span className="matrix-format">HEX / BIN</span>

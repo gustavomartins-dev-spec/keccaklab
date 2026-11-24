@@ -37,26 +37,27 @@ function renderApp() {
 describe('fluxos do laboratório', () => {
   it('permite avançar, voltar e reiniciar a matriz pela interface', async () => {
     const user = renderApp();
-    const matrix = screen.getByLabelText('Estado interno em matriz 5 por 5');
-    const initialState = matrix.textContent;
+    // The grid remounts on every step to restart its animation, so it is queried each time.
+    const matrix = () => screen.getByLabelText('Estado interno em matriz 5 por 5');
+    const initialState = matrix().textContent;
 
     expect(screen.getByRole('heading', { name: 'Visualizar Keccak' })).toBeInTheDocument();
-    expect(matrix.children).toHaveLength(25);
+    expect(matrix().children).toHaveLength(25);
     expect(screen.getByRole('button', { name: 'Etapa anterior' })).toBeDisabled();
 
     await user.click(screen.getByRole('button', { name: 'Próxima etapa' }));
     expect(
       screen.getByRole('heading', { name: 'Difusão por paridade de colunas' }),
     ).toBeInTheDocument();
-    expect(matrix.textContent).not.toBe(initialState);
+    expect(matrix().textContent).not.toBe(initialState);
     expect(screen.getByRole('button', { name: 'Etapa anterior' })).toBeEnabled();
 
     await user.click(screen.getByRole('button', { name: 'Etapa anterior' }));
-    expect(matrix.textContent).toBe(initialState);
+    expect(matrix().textContent).toBe(initialState);
     await user.click(screen.getByRole('button', { name: 'Próxima etapa' }));
     await user.click(screen.getByRole('button', { name: 'Reiniciar rodada' }));
     expect(screen.getByRole('heading', { name: 'Estado inicial' })).toBeInTheDocument();
-    expect(matrix.textContent).toBe(initialState);
+    expect(matrix().textContent).toBe(initialState);
   });
 
   it('preserva a etapa selecionada ao navegar entre as telas', async () => {

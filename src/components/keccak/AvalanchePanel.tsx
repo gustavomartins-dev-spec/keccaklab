@@ -1,11 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { KECCAK_STEPS } from '../../constants/keccak';
-import { flipInputBit, getAvalancheProfile, getStateAtStep, type FlippedBit } from '../../lib/keccak';
+import {
+  countBits,
+  flipInputBit,
+  getAvalancheDiff,
+  getAvalancheProfile,
+  getStateAtStep,
+  type FlippedBit,
+  type StepMode,
+} from '../../lib/keccak';
 import { formatByte } from '../../utils/format';
 
 interface AvalanchePanelProps {
   round: number;
   step: number;
+  mode?: StepMode;
   onSelectRound: (round: number) => void;
 }
 
@@ -45,7 +54,7 @@ function barPath(x: number, width: number, top: number, bottom: number): string 
 
 const percent = (bits: number) => `${((bits / TOTAL_BITS) * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}%`;
 
-export default function AvalanchePanel({ round, step, onSelectRound }: AvalanchePanelProps) {
+export default function AvalanchePanel({ round, step, mode = 'sequential', onSelectRound }: AvalanchePanelProps) {
   const [flipped, setFlipped] = useState<FlippedBit>({ x: 0, y: 0, bit: 0 });
   const [hovered, setHovered] = useState<number | null>(null);
   const [chartRef, W] = useElementWidth<HTMLDivElement>(640);
@@ -68,9 +77,15 @@ export default function AvalanchePanel({ round, step, onSelectRound }: Avalanche
   /* Below ~22px per column, label every other column to avoid collisions. */
   const showLabel = (i: number) => slot >= 22 || i % 2 === 1;
 
-  const diff = profile.diff[round][step];
-  const diffBits = profile.counts[round][step];
-  const roundCounts = profile.counts[round];
+  const diff = useMemo(() => getAvalancheDiff(profile, round, step, mode), [profile, round, step, mode]);
+  const diffBits = countBits(diff);
+  const roundCounts = useMemo(
+    () =>
+      mode === 'sequential'
+        ? profile.counts[round]
+        : KECCAK_STEPS.map((_, index) => countBits(getAvalancheDiff(profile, round, index, mode))),
+    [profile, round, mode],
+  );
   const hoveredColumn = hovered === null ? null : columns[hovered];
 
   const update = (field: keyof FlippedBit) => (event: React.ChangeEvent<HTMLSelectElement>) =>
@@ -199,8 +214,15 @@ export default function AvalanchePanel({ round, step, onSelectRound }: Avalanche
 
         <div className="avalanche-card">
           <div className="avalanche-card-title">
-            <strong>Diferença bit a bit · rodada {round}, {KECCAK_STEPS[step].label}</strong>
-            <span>Acompanha a rodada e a etapa selecionadas acima</span>
+            <strong>
+              Diferença bit a bit · rodada {round}, {KECCAK_STEPS[step].label}
+              {mode === 'isolated' && step > 0 ? ' isolado' : ''}
+            </strong>
+            <span>
+              {mode === 'isolated'
+                ? 'Modo isolado: só a etapa escolhida, aplicada à entrada da rodada'
+                : 'Acompanha a rodada e a etapa selecionadas acima'}
+            </span>
           </div>
           <div className="avalanche-count" aria-live="polite">
             <strong>{diffBits}</strong> de {TOTAL_BITS} bits diferentes <span>({percent(diffBits)})</span>

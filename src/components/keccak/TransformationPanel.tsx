@@ -1,9 +1,11 @@
 import { KECCAK_STEPS, LAST_KECCAK_STEP } from '../../constants/keccak';
+import type { StepMode } from '../../lib/keccak';
 import type { CellChange, StepDetail } from '../../types/keccak';
 import { formatByte } from '../../utils/format';
 import Icon from '../ui/Icon';
 
 interface TransformationPanelProps {
+  mode: StepMode;
   round: number;
   step: number;
   detail: StepDetail;
@@ -14,6 +16,7 @@ interface TransformationPanelProps {
 }
 
 export default function TransformationPanel({
+  mode,
   round,
   step,
   detail,
@@ -64,7 +67,10 @@ export default function TransformationPanel({
         </div>
       ) : (
         <div className="changes-box">
-          <span className="panel-label">CÉLULAS ALTERADAS ({cellChanges.length})</span>
+          <span className="panel-label">
+            CÉLULAS ALTERADAS ({cellChanges.length})
+            {mode === 'isolated' ? ' · EM RELAÇÃO À ENTRADA' : ''}
+          </span>
           <div className="changes-list">
             {cellChanges.slice(0, 4).map((change) => (
               <div className="change-item" key={`${change.x},${change.y}`}>
@@ -96,7 +102,11 @@ export default function TransformationPanel({
               ? 'Reproduzir novamente'
               : `Reproduzir rodada ${round}`}
         </button>
-        <span className="player-hint">Ordem: θ → ρ → π → χ → ι.</span>
+        <span className="player-hint">
+          {mode === 'sequential'
+            ? 'Ordem: θ → ρ → π → χ → ι.'
+            : 'Modo isolado: cada etapa parte da entrada da rodada.'}
+        </span>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { LAST_KECCAK_STEP, PLAYBACK_INTERVAL_MS } from '../constants/keccak';
+import { applyStep, getStateAtStep } from '../lib/keccak';
 import { useKeccak } from './useKeccak';
 
 beforeEach(() => vi.useFakeTimers());
@@ -131,5 +132,17 @@ describe('useKeccak', () => {
     expect(result.current.isPlaying).toBe(false);
   });
 
+  it('alterna entre os modos sequencial e isolado', () => {
+    const { result } = renderHook(useKeccak);
+    act(() => result.current.selectStep(3));
+    const sequential = result.current.matrix;
+    act(() => result.current.setMode('isolated'));
+    expect(result.current.mode).toBe('isolated');
+    expect(result.current.step).toBe(3);
+    expect(result.current.previousMatrix).toEqual(getStateAtStep(0));
+    expect(result.current.matrix).toEqual(applyStep(getStateAtStep(0), 3));
+    expect(result.current.matrix).not.toEqual(sequential);
+    expect(result.current.detail.shortDescription).toContain('Modo isolado');
+  });
 });
 

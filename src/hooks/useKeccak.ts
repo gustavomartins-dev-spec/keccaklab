@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LAST_KECCAK_ROUND, LAST_KECCAK_STEP, PLAYBACK_INTERVAL_MS } from '../constants/keccak';
 import { STEP_DETAILS } from '../constants/keccakDetails';
-import {
-  getCellChanges,
-  getChangedCellSet,
-  getRoundConstant,
-  getStateAtStep,
-  matrixToHex,
-} from '../lib/keccak';
+import { diffCells, getRoundConstant, getStepView, matrixToHex, type StepMode } from '../lib/keccak';
 import type { StepDetail } from '../types/keccak';
 import { formatByte } from '../utils/format';
 
@@ -15,8 +9,14 @@ const clampRound = (round: number): number => Math.max(0, Math.min(round, LAST_K
 const clampStep = (step: number): number => Math.max(0, Math.min(step, LAST_KECCAK_STEP));
 
 /** Adapts the static step texts to the selected round (round input and RC[i]). */
-export function getStepDetail(step: number, round: number): StepDetail {
+export function getStepDetail(step: number, round: number, mode: StepMode = 'sequential'): StepDetail {
   const base = STEP_DETAILS[step];
+  if (mode === 'isolated' && step > 0) {
+    return {
+      ...getStepDetail(step, round),
+      shortDescription: `${base.shortDescription} Modo isolado: aplicada sozinha à entrada da rodada ${round}.`,
+    };
+  }
   if (step === 0 && round > 0) {
     return {
       ...base,
@@ -46,12 +46,18 @@ export function useKeccak() {
   const [round, setRound] = useState(0);
   const [step, setStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [mode, setModeState] = useState<StepMode>('sequential');
 
-  const matrix = useMemo(() => getStateAtStep(step, round), [step, round]);
-  const changedCells = useMemo(() => getChangedCellSet(step, round), [step, round]);
-  const cellChanges = useMemo(() => getCellChanges(step, round), [step, round]);
+  const view = useMemo(() => getStepView(step, round, mode), [step, round, mode]);
+  const matrix = view.after;
+  const previousMatrix = view.before;
+  const cellChanges = useMemo(() => diffCells(view.before, view.after), [view]);
+  const changedCells = useMemo(
+    () => new Set(cellChanges.map((cell) => `${cell.x},${cell.y}`)),
+    [cellChanges],
+  );
   const hexState = useMemo(() => matrixToHex(matrix), [matrix]);
-  const detail = useMemo(() => getStepDetail(step, round), [step, round]);
+  const detail = useMemo(() => getStepDetail(step, round, mode), [step, round, mode]);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -99,6 +105,12 @@ export function useKeccak() {
 
   const pause = useCallback((): void => setIsPlaying(false), []);
 
+  /** Sequential: each step receives the previous result. Isolated: the step alone on the round input. */
+  const setMode = useCallback((nextMode: StepMode): void => {
+    setModeState(nextMode);
+    setIsPlaying(false);
+  }, []);
+
   const togglePlayback = useCallback((): void => {
     setStep((current) => (current === LAST_KECCAK_STEP ? 0 : current));
     setIsPlaying((current) => !current);
@@ -107,8 +119,10 @@ export function useKeccak() {
   return {
     round,
     step,
+    mode,
     isPlaying,
     matrix,
+    previousMatrix,
     changedCells,
     cellChanges,
     hexState,
@@ -117,6 +131,7 @@ export function useKeccak() {
     isLast: round === LAST_KECCAK_ROUND && step === LAST_KECCAK_STEP,
     selectStep,
     selectRound,
+    setMode,
     goNext,
     goPrevious,
     pause,

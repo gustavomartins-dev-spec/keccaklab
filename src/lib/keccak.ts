@@ -56,10 +56,8 @@ export const getStateAtStep = (step: number, round = 0): Matrix => {
 export const matrixToHex = (matrix: Matrix): string =>
   matrix.flat().map(value => value.toString(16).padStart(2, '0')).join('');
 
-export const getCellChanges = (step: number, round = 0): CellChange[] => {
-  if (step === 0) return [];
-  const before = getStateAtStep(step - 1, round);
-  const after = getStateAtStep(step, round);
+/** Lanes whose value differs between two states. */
+export const diffCells = (before: Matrix, after: Matrix): CellChange[] => {
   const changes: CellChange[] = [];
   for (let y = 0; y < 5; y++) {
     for (let x = 0; x < 5; x++) {
@@ -68,6 +66,54 @@ export const getCellChanges = (step: number, round = 0): CellChange[] => {
   }
   return changes;
 };
+
+export const getCellChanges = (step: number, round = 0): CellChange[] =>
+  step === 0 ? [] : diffCells(getStateAtStep(step - 1, round), getStateAtStep(step, round));
+
+/**
+ * Applies a single transformation (1 = θ … 5 = ι, 0 = none) to a state, without the
+ * other steps. ι uses the constant of the given round.
+ */
+export const applyStep = (matrix: Matrix, step: number, round = 0): Matrix => {
+  assertRound(round);
+  const state = Uint8Array.from(matrix.flat());
+  if (step === 1) theta(state);
+  else if (step === 2) rho(state);
+  else if (step === 3) pi(state);
+  else if (step === 4) chi(state);
+  else if (step === 5) iota(state, round);
+  else if (step !== 0) throw new RangeError('A etapa deve estar entre 0 e 5.');
+  return toMatrix(state);
+};
+
+export type StepMode = 'sequential' | 'isolated';
+
+/**
+ * State before and after the selected step. Sequential: the step receives the result of
+ * the previous one. Isolated: the step is applied alone to the input of the round.
+ */
+export const getStepView = (
+  step: number,
+  round: number,
+  mode: StepMode,
+): { before: Matrix; after: Matrix } => {
+  if (step === 0) {
+    const input = getStateAtStep(0, round);
+    return { before: input, after: input };
+  }
+  if (mode === 'sequential') {
+    return { before: getStateAtStep(step - 1, round), after: getStateAtStep(step, round) };
+  }
+  const input = getStateAtStep(0, round);
+  return { before: input, after: applyStep(input, step, round) };
+};
+
+/** Origin [x, y] of the lane that π moves to position (x, y). */
+export const getPiOrigin = (x: number, y: number): [number, number] => {
+  const entry = PI_ORIGINS[x + 5 * y];
+  return [entry[0], entry[1]];
+};
+
 export const getChangedCellSet = (step: number, round = 0): Set<string> =>
   new Set(getCellChanges(step, round).map(cell => `${cell.x},${cell.y}`));
 
@@ -88,6 +134,12 @@ export const getPiMap = (): Array<{ from: [number, number]; to: [number, number]
     const y = Math.floor(i / 5);
     return { from: [x, y], to: [y, (2 * x + 3 * y) % 5] };
   });
+
+const PI_ORIGINS: Array<[number, number]> = (() => {
+  const origins: Array<[number, number]> = Array.from({ length: 25 }, () => [0, 0]);
+  for (const { from, to } of getPiMap()) origins[to[0] + 5 * to[1]] = from;
+  return origins;
+})();
 
 export const getRoundConstant = (round: number): number => {
   if (!Number.isInteger(round) || round < 0 || round >= ROUND_CONSTANTS.length) {
@@ -110,6 +162,8 @@ export interface AvalancheProfile {
   diff: Matrix[][];
   /** Number of differing bits (0–200) for each round and step. */
   counts: number[][];
+  /** Trace of the input with the flipped bit. */
+  flipped: Matrix[][];
 }
 
 export const popcount8 = (value: number): number => {
@@ -149,7 +203,23 @@ export const getAvalancheProfile = (flipped: FlippedBit): AvalancheProfile => {
       matrix.map((row, y) => row.map((value, x) => value ^ other[round][step][y][x])),
     ),
   );
-  const profile = { diff, counts: diff.map(steps => steps.map(countBits)) };
+  const profile = { diff, counts: diff.map(steps => steps.map(countBits)), flipped: other };
   avalancheCache.set(key, profile);
   return profile;
+};
+
+const xorMatrices = (a: Matrix, b: Matrix): Matrix => a.map((row, y) => row.map((value, x) => value ^ b[y][x]));
+
+/** Difference between both executions at (round, step) in the given mode. */
+export const getAvalancheDiff = (
+  profile: AvalancheProfile,
+  round: number,
+  step: number,
+  mode: StepMode,
+): Matrix => {
+  if (mode === 'sequential' || step === 0) return profile.diff[round][step];
+  return xorMatrices(
+    applyStep(getStateAtStep(0, round), step, round),
+    applyStep(profile.flipped[round][0], step, round),
+  );
 };
