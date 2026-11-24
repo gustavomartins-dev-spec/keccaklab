@@ -1,24 +1,33 @@
-import { KECCAK_STEPS, LAST_KECCAK_STEP } from '../../constants/keccak';
+import type { ReactNode } from 'react';
 import { NAVIGATION_ITEMS } from '../../constants/navigation';
+import { usePersistentToggle } from '../../hooks/usePersistentToggle';
 import type { PageId } from '../../types/navigation';
 import Icon from '../ui/Icon';
 
 interface SidebarProps {
   activePage: PageId;
-  step: number;
   onNavigate: (page: PageId) => void;
-  onSelectStep: (step: number) => void;
+  children?: ReactNode;
 }
 
-export default function Sidebar({ activePage, step, onNavigate, onSelectStep }: SidebarProps) {
-  const progress = (step / LAST_KECCAK_STEP) * 100;
+export default function Sidebar({ activePage, onNavigate, children }: SidebarProps) {
+  const [collapsed, toggleCollapsed] = usePersistentToggle('keccaklab:sidebar-collapsed');
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
       <div className="brand-lockup">
-        <div className="brand-mark">
+        <button
+          className="brand-mark"
+          onClick={toggleCollapsed}
+          aria-expanded={!collapsed}
+          aria-label={collapsed ? 'Expandir barra lateral' : 'Recolher barra lateral'}
+          title={collapsed ? 'Expandir barra lateral' : 'Recolher barra lateral'}
+        >
           <Icon name="flask" size={24} />
-        </div>
+          <span className="brand-toggle-badge" aria-hidden="true">
+            <Icon name="chevron" size={11} />
+          </span>
+        </button>
         <div>
           <strong>
             keccak<span>lab</span>
@@ -34,6 +43,8 @@ export default function Sidebar({ activePage, step, onNavigate, onSelectStep }: 
             className={activePage === item.id ? 'nav-item active' : 'nav-item'}
             key={item.id}
             aria-current={activePage === item.id ? 'page' : undefined}
+            aria-label={collapsed ? item.label : undefined}
+            title={collapsed ? item.label : undefined}
             onClick={() => onNavigate(item.id)}
           >
             <Icon name={item.icon} size={20} />
@@ -42,45 +53,7 @@ export default function Sidebar({ activePage, step, onNavigate, onSelectStep }: 
           </button>
         ))}
       </nav>
-      <div className="sidebar-journey">
-        <div className="sidebar-section-label">ETAPAS DA RODADA</div>
-        <div className="journey-heading">
-          <Icon name="book" size={17} />
-          <span>Rodada Keccak</span>
-        </div>
-        <div
-          className="journey-progress"
-          role="progressbar"
-          aria-label="Etapa da rodada"
-          aria-valuemin={0}
-          aria-valuemax={LAST_KECCAK_STEP}
-          aria-valuenow={step}
-        >
-          <span style={{ width: `${progress}%` }} />
-        </div>
-        <div className="journey-caption">
-          <span>
-            {step} de {LAST_KECCAK_STEP} transformações
-          </span>
-          <strong>{progress}%</strong>
-        </div>
-        <div className="journey-steps">
-          {KECCAK_STEPS.slice(1).map(({ label, symbol }, index) => (
-            <button
-              key={label}
-              className={`journey-step ${step > index ? 'visited' : ''}`}
-              aria-current={activePage === 'keccak' && step === index + 1 ? 'step' : undefined}
-              onClick={() => onSelectStep(index + 1)}
-            >
-              <span className="journey-dot">
-                {step > index ? <Icon name="check" size={11} /> : index + 1}
-              </span>
-              {label}
-              <span className="journey-greek">{symbol}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {children}
       <div className="sidebar-bottom">
         <div className="sidebar-footer">
           <span className="pulse-dot" /> Laboratório interativo <span>v1.0</span>

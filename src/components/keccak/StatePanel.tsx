@@ -46,22 +46,26 @@ export default function StatePanel({
   onPrevious,
 }: StatePanelProps) {
   const [replay, setReplay] = useState(0);
+  const isFinal = round === LAST_KECCAK_ROUND && step === LAST_KECCAK_STEP;
   return (
     <div className="state-panel">
       <div className="panel-header">
-        <div className="panel-title">
-          <span className="panel-icon">
-            <Icon name="grid" size={19} />
+        <h3>Matriz do estado</h3>
+        <div className="legend">
+          <span>
+            <i className="legend-dot stable" /> Sem mudança
           </span>
-          <div>
-            <h3>Matriz do estado</h3>
-            <span className="panel-subtitle">5 × 5 lanes · 8 bits por célula</span>
-          </div>
+          <span>
+            <i className="legend-dot changed" /> Alterada
+          </span>
+          <span>
+            <b className="legend-bit" aria-hidden="true">1</b> Bit invertido
+          </span>
         </div>
         <span className="round-tag">
           R{round} · A<sub>{step}</sub>
           <span />
-          200 bits
+          5 × 5 · 8 bits
         </span>
       </div>
       <MatrixView
@@ -71,38 +75,21 @@ export default function StatePanel({
         changedCells={changedCells}
         animationKey={`${round}-${step}-${mode}-${replay}`}
       />
-      <div className="animation-caption">
-        <p>{ANIMATION_CAPTIONS[step]}</p>
-        {step > 0 && (
-          <button className="text-button" onClick={() => setReplay((n) => n + 1)}>
-            <Icon name="reset" size={14} /> Animar novamente
-          </button>
-        )}
-      </div>
-      <div className="matrix-footer">
-        <div className="legend">
-          <span>
-            <i className="legend-dot stable" /> Sem mudança
-          </span>
-          <span>
-            <i className="legend-dot changed" /> Célula alterada
-          </span>
-          <span>
-            <i className="legend-dot flip" /> Bit invertido
-          </span>
-        </div>
-        <span className="matrix-format">HEX / BIN</span>
-      </div>
-      <div className="state-output">
-        <span>ESTADO EM HEXADECIMAL</span>
-        <code title={`0x${hexState}`}>0x{hexState}</code>
-      </div>
-      {round === LAST_KECCAK_ROUND && step === LAST_KECCAK_STEP && (
+      {isFinal ? (
         <p className="final-output-note" role="status">
           <Icon name="check" size={16} />
           Fim da rodada {LAST_KECCAK_ROUND}: este é o resultado completo de Keccak-f[200] sobre a
           matriz inicial.
         </p>
+      ) : (
+        <div className="animation-caption">
+          <p>{ANIMATION_CAPTIONS[step]}</p>
+          {step > 0 && (
+            <button className="text-button" onClick={() => setReplay((n) => n + 1)}>
+              <Icon name="reset" size={14} /> Animar novamente
+            </button>
+          )}
+        </div>
       )}
       <div className="player-controls">
         <button
@@ -117,9 +104,12 @@ export default function StatePanel({
         <div className="player-step" aria-live="polite">
           <strong>{KECCAK_STEPS[step].label}</strong>
           <span>
-            Rodada {round} · etapa {step} de {LAST_KECCAK_STEP}
+            R{round} · etapa {step}/{LAST_KECCAK_STEP}
           </span>
         </div>
+        <code className="state-hex" title={`Estado em hexadecimal: 0x${hexState}`}>
+          0x{hexState}
+        </code>
         <div className="player-arrows">
           <button
             className="icon-button"

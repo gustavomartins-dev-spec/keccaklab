@@ -27,5 +27,10 @@ function startTask<T>(type: 'search' | 'compare', bits: number, seed: number, on
 
 export const startCollisionSearch = (bits: number, seed: number, onProgress: (progress: SearchProgress) => void): RunningTask<RhoResult> =>
   startTask('search', bits, seed, onProgress);
-export const startCollisionComparison = (onProgress: (progress: SearchProgress) => void): RunningTask<ComparisonEntry[]> =>
-  startTask('compare', 8, 7, onProgress);
+/** A fresh random run seed, so each comparison draws new starting points. */
+const randomRunSeed = (): number => crypto.getRandomValues(new Uint32Array(1))[0];
+
+export const startCollisionComparison = (
+  onProgress: (progress: SearchProgress) => void,
+  runSeed: number = randomRunSeed(),
+): RunningTask<ComparisonEntry[]> => startTask('compare', 8, runSeed, onProgress);

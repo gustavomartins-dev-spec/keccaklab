@@ -84,8 +84,34 @@ export function runPollardRho(bits: number, options: SearchOptions = {}): RhoRes
   return next.value;
 }
 
-export function* comparePollardRho(sizes: readonly OutputBits[], trials: number): Generator<SearchProgress, ComparisonEntry[]> {
-  if (!Number.isInteger(trials) || trials < 1 || trials > 20) throw new RangeError('Número de amostras inválido.');
+/** Small seeded PRNG (mulberry32): a run seed always gives the same sequence of draws. */
+export function createRandom(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 2 ** 32;
+  };
+}
+
+/** Distinct starting points drawn uniformly from the domain (repeats only if count exceeds it). */
+export function drawSeeds(random: () => number, count: number, domainSize: number): number[] {
+  const seeds = new Set<number>();
+  while (seeds.size < Math.min(count, domainSize)) seeds.add(Math.floor(random() * domainSize));
+  const list = [...seeds];
+  while (list.length < count) list.push(list[list.length % seeds.size]);
+  return list;
+}
+
+/**
+ * Average length of the rho (μ + λ) for each output size, over `trials` seeds drawn at random
+ * from `runSeed`. Each run of the comparison uses a new runSeed, so results vary between runs.
+ */
+export function* comparePollardRho(sizes: readonly OutputBits[], trials: number, runSeed = 1): Generator<SearchProgress, ComparisonEntry[]> {
+  if (!Number.isInteger(trials) || trials < 1 || trials > 100) throw new RangeError('Número de amostras inválido.');
+  const random = createRandom(runSeed);
   const entries: ComparisonEntry[] = [];
   let completedTrials = 0;
   for (const bits of sizes) {
@@ -93,8 +119,8 @@ export function* comparePollardRho(sizes: readonly OutputBits[], trials: number)
     let evaluations = 0;
     let minIterations = Infinity;
     let maxIterations = 0;
-    for (let trial = 0; trial < trials; trial++) {
-      const search = searchPollardRho(bits, { seed: (7 + 17 * trial) % 2 ** bits });
+    for (const seed of drawSeeds(random, trials, 2 ** bits)) {
+      const search = searchPollardRho(bits, { seed });
       let next = search.next();
       while (!next.done) {
         yield { ...next.value, completedTrials, totalTrials: sizes.length * trials };

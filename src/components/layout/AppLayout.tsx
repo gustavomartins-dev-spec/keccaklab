@@ -6,31 +6,33 @@ import Topbar from './Topbar';
 interface AppLayoutProps {
   children: ReactNode;
   activePage: PageId;
-  step: number;
   onNavigate: (page: PageId) => void;
-  onSelectStep: (step: number) => void;
+  /** Extra breadcrumb level after the page name (a sub-screen). */
+  breadcrumbDetail?: string;
+  /** Page-specific navigation shown below the modules (the rounds rail). */
+  sidebarContent?: ReactNode;
 }
 
 export default function AppLayout({
   children,
   activePage,
-  step,
   onNavigate,
-  onSelectStep,
+  breadcrumbDetail,
+  sidebarContent,
 }: AppLayoutProps) {
   return (
-    <div className="app-shell">
+    <div className={`app-shell page-${activePage}`}>
       <a className="skip-link" href="#main-content">
         Ir para o conteúdo
       </a>
       <Sidebar
         activePage={activePage}
-        step={step}
         onNavigate={onNavigate}
-        onSelectStep={onSelectStep}
-      />
+      >
+        {sidebarContent}
+      </Sidebar>
       <main className="main-content" id="main-content" tabIndex={-1}>
-        <Topbar activePage={activePage} />
+        <Topbar activePage={activePage} detail={breadcrumbDetail} />
         {children}
       </main>
     </div>

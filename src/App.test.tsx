@@ -80,18 +80,43 @@ describe('fluxos do laboratório', () => {
     ).toHaveAttribute('aria-current', 'step');
   });
 
-  it('abre a etapa escolhida na barra lateral a partir da tela de colisões', async () => {
+  it('abre a rodada escolhida na barra lateral a partir da tela de colisões', async () => {
     const user = renderApp();
     await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
-    await user.click(screen.getByRole('button', { name: /Chi/ }));
+    const rounds = screen.getByRole('group', { name: 'Rodadas de Keccak-f[200]' });
+    await user.click(within(rounds).getByRole('button', { name: 'Rodada 5' }));
 
+    expect(screen.getByRole('heading', { name: 'Visualizar Keccak' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Entrada da rodada 5' })).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Substituição não-linear entre vizinhos' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('progressbar', { name: 'Etapa da rodada' })).toHaveAttribute(
-      'aria-valuenow',
-      '4',
+      within(screen.getByRole('group', { name: 'Rodadas de Keccak-f[200]' })).getByRole('button', {
+        name: 'Rodada 5',
+      }),
+    ).toHaveAttribute('aria-current', 'step');
+  });
+
+  it('recolhe a barra lateral e os painéis do inspetor, lembrando a escolha', async () => {
+    const user = renderApp();
+    await user.click(screen.getByRole('button', { name: 'Recolher barra lateral' }));
+    expect(screen.getByRole('button', { name: 'Expandir barra lateral' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
     );
+    // A navegação continua acessível pelo nome, mesmo só com ícones.
+    expect(screen.getByRole('button', { name: 'Busca de colisões' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Recolher painel de transformação' }));
+    expect(screen.queryByRole('button', { name: 'Detalhes da transformação' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Estado inicial' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Recolher painel de efeito avalanche' }));
+    expect(
+      screen.queryByLabelText('Bits que diferem entre as duas execuções, matriz 5 por 5'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('1', { selector: '.avalanche-count strong' })).toBeInTheDocument();
+
+    expect(window.localStorage.getItem('keccaklab:sidebar-collapsed')).toBe('1');
+    expect(window.localStorage.getItem('keccaklab:transformation-collapsed')).toBe('1');
   });
 
   it('abre os detalhes da transformação e restaura o foco ao fechar', async () => {
@@ -195,12 +220,21 @@ describe('fluxos do laboratório', () => {
     expect(screen.getByText('saída 16 bits')).toBeInTheDocument();
   });
 
-  it('compara as três saídas e conserva a comparação ao trocar de tela', async () => {
+  it('compara as três saídas na tela derivada e a conserva ao trocar de tela', async () => {
     const user = renderApp();
     await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
-    const chartName = 'Gráfico comparando comprimento de ρ por tamanho de saída';
+    const views = screen.getByRole('navigation', { name: 'Telas da busca de colisões' });
+    await user.click(within(views).getByRole('button', { name: 'Comparar tamanhos' }));
+    expect(within(views).getByRole('button', { name: 'Comparar tamanhos' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    // A tela de comparação não mostra o diagrama da busca única.
+    expect(screen.queryByRole('button', { name: 'Executar busca' })).not.toBeInTheDocument();
+
+    const chartName = /passos até repetir um valor/;
     expect(screen.queryByRole('img', { name: chartName })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Comparar tamanhos' }));
+    await user.click(screen.getByRole('button', { name: 'Executar comparação' }));
 
     const chart = screen.getByRole('img', { name: chartName });
     for (const label of ['8 bits', '16 bits', '24 bits']) {
@@ -211,5 +245,27 @@ describe('fluxos do laboratório', () => {
     await user.click(screen.getByRole('button', { name: 'Visualizador Keccak' }));
     await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
     expect(screen.getByRole('img', { name: chartName })).toBeInTheDocument();
+
+    await user.click(within(screen.getByRole('navigation', { name: 'Telas da busca de colisões' })).getByRole('button', { name: 'Busca única' }));
+    expect(screen.getByLabelText('Verificação da colisão')).toHaveTextContent('a ≠ b');
+  });
+
+  it('explica o método num modal, fora da tela principal', async () => {
+    const user = renderApp();
+    await user.click(screen.getByRole('button', { name: 'Busca de colisões' }));
+    await user.click(screen.getByRole('button', { name: 'Como funciona' }));
+    const dialog = screen.getByRole('dialog', { name: 'Como funciona a busca de colisões' });
+    // Um tópico por vez: começa na função h e avança pelos botões, setas ou abas.
+    expect(within(dialog).getByRole('heading', { name: 'A função h' })).toBeInTheDocument();
+    expect(within(dialog).queryByRole('heading', { name: 'Floyd: tartaruga e lebre' })).not.toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: 'Tópico anterior' })).toBeDisabled();
+    await user.click(within(dialog).getByRole('button', { name: 'Próximo tópico' }));
+    expect(within(dialog).getByRole('heading', { name: 'Floyd: tartaruga e lebre' })).toBeInTheDocument();
+    await user.keyboard('{ArrowRight}');
+    expect(within(dialog).getByRole('heading', { name: 'Como ler o diagrama' })).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: /O nome/ }));
+    expect(within(dialog).getByRole('button', { name: 'Próximo tópico' })).toBeDisabled();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

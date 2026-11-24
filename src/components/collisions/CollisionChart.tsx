@@ -2,6 +2,8 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { line, path as createPath } from 'd3';
 import { buildRhoVisualization, canonicalIndex } from '../../lib/rhoVisualization';
 import type { RhoNode, RhoResult } from '../../types/experiments';
+import { useSvgScale } from '../../hooks/useSvgScale';
+import Icon from '../ui/Icon';
 import { formatHex } from '../../utils/format';
 
 interface CollisionChartProps { result: RhoResult }
@@ -11,6 +13,7 @@ export default function CollisionChart({result}: CollisionChartProps) {
   const bits = result.bits;
   const markerId = useId().replace(/[^a-zA-Z0-9_-]/g,'');
   const [selected, setSelected] = useState<RhoNode | null>(null);
+  const [svgRef, svgScale] = useSvgScale(760, 450);
   const visualization = useMemo(() => buildRhoVisualization(result),[result]);
   const [frameIndex,setFrameIndex] = useState(0);
   const [playing,setPlaying] = useState(false);
@@ -22,6 +25,7 @@ export default function CollisionChart({result}: CollisionChartProps) {
     return ()=>window.clearTimeout(timer);
   },[playing,frameIndex,visualization.frames.length]);
   const frame=visualization.frames[frameIndex];
+  const atEnd=frameIndex===visualization.frames.length-1;
   const tail=visualization.nodes.filter(node=>node.group==='tail');
   const cycle=visualization.nodes.filter(node=>node.group==='cycle');
   const nodes: PositionedNode[] = [
@@ -61,10 +65,11 @@ export default function CollisionChart({result}: CollisionChartProps) {
     <div className="rho-visual">
       <div className="panel-header">
         <div><span className="panel-label">POLLARD RHO · DETECÇÃO COM FLOYD</span><h3>Cauda + ciclo</h3></div>
+        <div className="chart-legend"><span><i className="legend-dot path"/>cauda</span><span><i className="legend-dot cycle"/>ciclo</span><span>□ T: tartaruga</span><span>○ L: lebre</span></div>
         <span className="round-tag">saída {bits} bits</span>
       </div>
       <div className="rho-graph-scroll" role="region" aria-label="Diagrama de cauda e ciclo; deslize para explorar" tabIndex={0}>
-        <svg className="rho-graph" viewBox="0 0 760 450" role="group" aria-label="Trajetória rho com cauda, ciclo e ponteiros de Floyd">
+        <svg ref={svgRef} style={svgScale} className="rho-graph" viewBox="0 0 760 450" role="group" aria-label="Trajetória rho com cauda, ciclo e ponteiros de Floyd">
           <title>Cauda com {result.cycleStart} estados e ciclo com {result.cycleLength} estados</title>
           <defs>{(['tail','cycle'] as const).map(group => <marker key={group} id={markerId+'-'+group} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill={group==='tail' ? 'var(--accent)' : 'var(--accent-2)'}/></marker>)}</defs>
           <text x="40" y="30" className="rho-region-label">CAUDA · μ = {result.cycleStart}</text>
@@ -91,23 +96,21 @@ export default function CollisionChart({result}: CollisionChartProps) {
         </svg>
       </div>
       <p className="rho-selection" role="status">{selected?.value != null ? 'Estado x'+selected.index+' = 0x'+formatHex(selected.value,bits) : 'Selecione um nó por toque, clique ou teclado para consultar seu valor.'}</p>
-      <div className="chart-legend"><span><i className="legend-dot path"/>cauda</span><span><i className="legend-dot cycle"/>ciclo</span><span>□ T: tartaruga, 1 passo</span><span>○ L: lebre, 2 passos</span></div>
       <div className="floyd-playback">
         <div className="floyd-buttons">
-          <button className="secondary-button" onClick={()=>{setPlaying(false);setFrameIndex(index=>Math.max(0,index-1));}} disabled={frameIndex===0} aria-label="Passo anterior de Floyd">←</button>
-          <button className="primary-button" onClick={()=>{if(frameIndex===visualization.frames.length-1)setFrameIndex(0);setPlaying(value=>!value);}}>{playing ? 'Pausar Floyd' : 'Reproduzir Floyd'}</button>
-          <button className="secondary-button" onClick={()=>{setPlaying(false);setFrameIndex(index=>Math.min(visualization.frames.length-1,index+1));}} disabled={frameIndex===visualization.frames.length-1} aria-label="Próximo passo de Floyd">→</button>
+          <button className="icon-button" onClick={()=>{setPlaying(false);setFrameIndex(index=>Math.max(0,index-1));}} disabled={frameIndex===0} aria-label="Passo anterior de Floyd" title="Passo anterior">
+            <Icon name="arrow-left" size={17}/>
+          </button>
+          <button className="primary-button" onClick={()=>{if(atEnd)setFrameIndex(0);setPlaying(value=>!value);}}>
+            <Icon name={playing ? 'pause' : atEnd ? 'reset' : 'play'} size={16}/>
+            {playing ? 'Pausar Floyd' : atEnd ? 'Reproduzir novamente' : 'Reproduzir Floyd'}
+          </button>
+          <button className="icon-button" onClick={()=>{setPlaying(false);setFrameIndex(index=>Math.min(visualization.frames.length-1,index+1));}} disabled={atEnd} aria-label="Próximo passo de Floyd" title="Próximo passo">
+            <Icon name="arrow-right" size={17}/>
+          </button>
         </div>
         {frame && <p className="floyd-state" aria-live="polite">Passo {frame.step}: T = 0x{formatHex(frame.tortoise,bits)} · L = 0x{formatHex(frame.hare,bits)}{frame.tortoise===frame.hare ? ' · encontro dos ponteiros' : ''}</p>}
-        <p className="control-description">A animação mostra somente a fase 1 de Floyd: o encontro que detecta o ciclo. A colisão é recuperada depois, pelas duas entradas distintas que chegam à entrada do ciclo.</p>
         {visualization.condensed && <p className="control-description">Trajetória resumida: “…” indica estados omitidos. A reprodução mostra até 48 passos iniciais e salta para o encontro final. Ponteiros sobre “…” podem representar estados distintos desse trecho.</p>}
-      </div>
-      <div className="collision-proof" aria-label="Verificação da colisão">
-        <strong>Colisão verificada: a ≠ b e h(a) = h(b)</strong>
-        <code>a = 0x{formatHex(result.collisionInputs[0],bits)}</code>
-        <code>b = 0x{formatHex(result.collisionInputs[1],bits)}</code>
-        <code>h(a) = h(b) = 0x{formatHex(result.collisionValue,bits)}</code>
-        <small>a e b são as entradas distintas da colisão, marcadas com anéis tracejados. Na cauda, os números são índices absolutos; no ciclo, são deslocamentos a partir de xμ. Selecione um nó para consultar seu índice absoluto e valor. No celular, deslize o diagrama para explorar.</small>
       </div>
     </div>
   );
