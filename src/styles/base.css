@@ -37,5 +37,5 @@ button svg { flex-shrink: 0; }
 .app-shell { display: flex; min-height: 100vh; }
 
 /* Keep browser-default small text and mathematical indices readable. */
-small { font-size: max(12px, .8333em); }
-sub, sup { font-size: max(12px, .75em); }
+small { font-size: max(13px, .8333em); }
+sub, sup { font-size: max(13px, .75em); }

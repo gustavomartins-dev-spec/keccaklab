@@ -1,4 +1,5 @@
 import { scaleLog } from 'd3';
+import { useSvgScale } from '../../hooks/useSvgScale';
 import type { ComparisonEntry } from '../../types/experiments';
 
 export default function ComparisonChart({comparison}: {comparison:ComparisonEntry[]}) {
@@ -6,11 +7,12 @@ export default function ComparisonChart({comparison}: {comparison:ComparisonEntr
   const height=scaleLog().base(2).domain([1,max]).range([0,165]);
   const chartWidth = Math.max(800, comparison.length * 180 + 100);
   const plotWidth = chartWidth - 100;
+  const [svgRef, svgScale] = useSvgScale(chartWidth, 280);
   const ticks = Array.from({length: Math.floor(Math.log2(max) / 4) + 1}, (_, k) => 16 ** k);
   return (
     <>
       <div className="comparison-chart">
-        <svg viewBox={`0 0 ${chartWidth} 280`} style={{minWidth: chartWidth}} role="img" aria-label="Gráfico comparando comprimento de ρ por tamanho de saída">
+        <svg ref={svgRef} style={svgScale} viewBox={`0 0 ${chartWidth} 280`} role="img" aria-label="Gráfico comparando comprimento de ρ por tamanho de saída">
           <text className="bar-label" x="60" y="24">comprimento de ρ (μ + λ) · escala log₂</text>
           {ticks.map(value=><g key={value}><path className="chart-grid" d={'M60 '+(225-height(value))+'H'+(chartWidth-40)}/><text className="bar-label" x="52" y={229-height(value)} textAnchor="end">{value}</text></g>)}
           {comparison.map((entry,i)=>{

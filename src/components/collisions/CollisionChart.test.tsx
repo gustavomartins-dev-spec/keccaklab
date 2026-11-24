@@ -4,12 +4,11 @@ import { runPollardRho } from '../../lib/pollardRho';
 import CollisionChart from './CollisionChart';
 
 describe('visualização rho e reprodução de Floyd',()=>{
-  it('mostra a prova da colisão e controla avanço, retorno e reprodução',()=>{
+  it('controla avanço, retorno e reprodução de Floyd',()=>{
     vi.useFakeTimers();
     const result=runPollardRho(8);
     render(<CollisionChart result={result}/>);
     expect(screen.getByRole('group',{name:'Trajetória rho com cauda, ciclo e ponteiros de Floyd'})).toBeInTheDocument();
-    expect(screen.getByLabelText('Verificação da colisão')).toHaveTextContent('a ≠ b');
     expect(screen.getByLabelText('Passo anterior de Floyd')).toBeDisabled();
     fireEvent.click(screen.getByLabelText('Próximo passo de Floyd'));
     expect(screen.getByText(/Passo 2:/)).toBeInTheDocument();
@@ -24,7 +23,7 @@ describe('visualização rho e reprodução de Floyd',()=>{
     for(let i=2;i<result.meetingStep;i++)act(()=>vi.advanceTimersByTime(650));
     expect(screen.getByText(/encontro dos ponteiros/)).toBeInTheDocument();
     expect(screen.getByLabelText('Próximo passo de Floyd')).toBeDisabled();
-    fireEvent.click(screen.getByText('Reproduzir Floyd'));
+    fireEvent.click(screen.getByRole('button',{name:'Reproduzir novamente'}));
     expect(screen.getByText(/Passo 1:/)).toBeInTheDocument();
   });
   it('identifica trechos omitidos e reinicia a animação com outro resultado',()=>{

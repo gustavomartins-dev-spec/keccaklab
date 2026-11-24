@@ -13,7 +13,8 @@ export type IconName =
   | 'book'
   | 'check'
   | 'info'
-  | 'close';
+  | 'close'
+  | 'chart';
 
 const paths: Record<IconName, ReactNode> = {
   grid: (
@@ -64,6 +65,7 @@ const paths: Record<IconName, ReactNode> = {
     </>
   ),
   close: <path d="m6 6 12 12M6 18 18 6" />,
+  chart: <path d="M4 20h16M7 16v-4m5 4V6m5 10v-7" />,
 };
 
 export default function Icon({
