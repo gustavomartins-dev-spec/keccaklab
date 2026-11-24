@@ -8,6 +8,9 @@ import {
   getPiMap,
   getRoundConstant,
   getStateAtStep,
+  getAvalancheProfile,
+  flipInputBit,
+  popcount8,
   matrixToHex,
 } from './keccak';
 
@@ -150,5 +153,46 @@ describe('rodadas do visualizador Keccak', () => {
     const copy = getStateAtStep(3, 9);
     copy[0][0] ^= 0xff;
     expect(getStateAtStep(3, 9)[0][0]).not.toBe(copy[0][0]);
+  });
+});
+
+describe('efeito avalanche', () => {
+  it('inverte exatamente um bit da entrada', () => {
+    const profile = getAvalancheProfile({ x: 2, y: 3, bit: 7 });
+    expect(profile.counts[0][0]).toBe(1);
+    expect(profile.diff[0][0][3][2]).toBe(0x80);
+  });
+
+  it('ρ e π preservam a quantidade de bits diferentes em todas as rodadas', () => {
+    const { counts } = getAvalancheProfile({ x: 0, y: 0, bit: 0 });
+    for (const steps of counts) {
+      expect(steps[2]).toBe(steps[1]);
+      expect(steps[3]).toBe(steps[2]);
+    }
+  });
+
+  it('θ espalha 1 bit para 11 bits (a própria coluna e duas colunas vizinhas)', () => {
+    expect(getAvalancheProfile({ x: 1, y: 4, bit: 3 }).counts[0][1]).toBe(11);
+  });
+
+  it('a diferença final corresponde a Keccak-f[200] aplicado às duas entradas', () => {
+    const flipped = { x: 4, y: 1, bit: 5 };
+    const a = keccakF200(Uint8Array.from(getStateAtStep(0).flat()));
+    const b = keccakF200(flipInputBit(flipped));
+    const expected = a.reduce((sum, value, i) => sum + popcount8(value ^ b[i]), 0);
+    expect(getAvalancheProfile(flipped).counts[17][5]).toBe(expected);
+  });
+
+  it('atinge cerca de metade do estado após poucas rodadas', () => {
+    const { counts } = getAvalancheProfile({ x: 0, y: 0, bit: 0 });
+    for (let round = 3; round < 18; round++) {
+      expect(counts[round][5]).toBeGreaterThan(70);
+      expect(counts[round][5]).toBeLessThan(130);
+    }
+  });
+
+  it('rejeita posições de bit inválidas', () => {
+    expect(() => flipInputBit({ x: 5, y: 0, bit: 0 })).toThrow(RangeError);
+    expect(() => flipInputBit({ x: 0, y: 0, bit: 8 })).toThrow(RangeError);
   });
 });

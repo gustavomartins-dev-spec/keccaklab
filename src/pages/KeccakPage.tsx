@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import AvalanchePanel from '../components/keccak/AvalanchePanel';
 import RoundNavigator from '../components/keccak/RoundNavigator';
 import StatePanel from '../components/keccak/StatePanel';
 import StepNavigator from '../components/keccak/StepNavigator';
@@ -82,6 +83,7 @@ export default function KeccakPage({ visualizer }: KeccakPageProps) {
           onTogglePlayback={togglePlayback}
         />
       </div>
+      <AvalanchePanel round={round} step={step} onSelectRound={selectRound} />
       <div className="module-footnote">
         <span className="footnote-icon">
           <Icon name="book" size={21} />

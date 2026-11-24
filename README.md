@@ -17,7 +17,7 @@ As execuções são registradas no banco usando as variáveis `VITE_SUPABASE_URL
 
 ## Módulo de colisões e Keccak-200
 
-O visualizador aplica as cinco etapas oficiais em cada uma das 18 rodadas de Keccak-f[200] (0 a 17), com seletor de rodadas; a saída de uma rodada é a entrada da seguinte. A busca usa esse mesmo núcleo dentro de uma esponja didática Keccak[r=120,c=80], com 18 rodadas, preenchimento pad10*1 e sufixo 0x01. Esta instância de 200 bits não é SHA3-256 nem outra função SHA-3 padronizada.
+O visualizador aplica as cinco etapas oficiais em cada uma das 18 rodadas de Keccak-f[200] (0 a 17), com seletor de rodadas; a saída de uma rodada é a entrada da seguinte. O painel de efeito avalanche inverte um bit da entrada e mostra, rodada a rodada, quantos dos 200 bits diferem entre as duas execuções. A busca usa esse mesmo núcleo dentro de uma esponja didática Keccak[r=120,c=80], com 18 rodadas, preenchimento pad10*1 e sufixo 0x01. Esta instância de 200 bits não é SHA3-256 nem outra função SHA-3 padronizada.
 
 O segundo módulo oferece saídas de 4, 6, 8, 12, 16, 20, 24, 28, 32, 36 e 40 bits, semente configurável, progresso e cancelamento. Floyd encontra o ciclo em memória constante, recupera duas entradas distintas e verifica seus resumos antes de apresentar a colisão. Buscas grandes e a comparação de múltiplas sementes rodam em Web Worker. Cada busca tem limite de 20 milhões de avaliações e até 64 sementes; atingir o limite produz uma mensagem, sem fabricar um resultado.
 

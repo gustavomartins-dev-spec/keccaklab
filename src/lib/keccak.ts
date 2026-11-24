@@ -95,3 +95,61 @@ export const getRoundConstant = (round: number): number => {
   }
   return ROUND_CONSTANTS[round];
 };
+
+/* ---------- Avalanche: one flipped input bit, two executions compared ---------- */
+
+export interface FlippedBit {
+  x: number;
+  y: number;
+  /** 0 is the least significant bit of the lane. */
+  bit: number;
+}
+
+export interface AvalancheProfile {
+  /** XOR between the original and the flipped trace: diff[round][step]. */
+  diff: Matrix[][];
+  /** Number of differing bits (0–200) for each round and step. */
+  counts: number[][];
+}
+
+export const popcount8 = (value: number): number => {
+  let count = 0;
+  for (let v = value & 0xff; v; v &= v - 1) count++;
+  return count;
+};
+
+export const countBits = (matrix: Matrix): number =>
+  matrix.reduce((total, row) => total + row.reduce((sum, value) => sum + popcount8(value), 0), 0);
+
+const assertFlippedBit = ({ x, y, bit }: FlippedBit): void => {
+  const valid = (value: number, max: number) => Number.isInteger(value) && value >= 0 && value <= max;
+  if (!valid(x, 4) || !valid(y, 4) || !valid(bit, 7)) {
+    throw new RangeError('O bit invertido deve ter x e y entre 0 e 4 e bit entre 0 e 7.');
+  }
+};
+
+/** Returns a copy of the visualizer's initial matrix with one bit flipped. */
+export const flipInputBit = (flipped: FlippedBit): Uint8Array => {
+  assertFlippedBit(flipped);
+  const input = Uint8Array.from(seedMatrix.flat());
+  input[flipped.x + 5 * flipped.y] ^= 1 << flipped.bit;
+  return input;
+};
+
+const avalancheCache = new Map<string, AvalancheProfile>();
+
+/** Compares the visualizer's trace with the trace of the input with one bit flipped. */
+export const getAvalancheProfile = (flipped: FlippedBit): AvalancheProfile => {
+  const key = `${flipped.x},${flipped.y},${flipped.bit}`;
+  const cached = avalancheCache.get(key);
+  if (cached) return cached;
+  const other = computeTrace(flipInputBit(flipped));
+  const diff = TRACE.map((steps, round) =>
+    steps.map((matrix, step) =>
+      matrix.map((row, y) => row.map((value, x) => value ^ other[round][step][y][x])),
+    ),
+  );
+  const profile = { diff, counts: diff.map(steps => steps.map(countBits)) };
+  avalancheCache.set(key, profile);
+  return profile;
+};
